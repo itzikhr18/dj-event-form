@@ -6,7 +6,6 @@
   <title>איפיון אירוע · ידידיה יונה</title>
   <meta name="description" content="טופס איפיון אירוע — מלאו את כל הפרטים והם יישלחו ישירות לדיג'יי ידידיה יונה" />
 
-  <!-- favicon + תצוגה מקדימה בשיתוף (OG) -->
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
   <meta property="og:title" content="איפיון אירוע · ידידיה יונה" />
@@ -14,17 +13,13 @@
   <meta property="og:image" content="logo.png" />
   <meta property="og:type" content="website" />
 
-  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- גופן עברי -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- ייצור PDF בצד-לקוח (אופציונלי) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
-  <!-- קונפטי למסך ההצלחה -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <script>
@@ -42,7 +37,7 @@
   </script>
 
   <style>
-    body { font-size: 16px; line-height: 1.7; word-spacing: 0.05em; }
+    body { font-size: 16px; line-height: 1.7; }
     .bg-stage {
       background:
         radial-gradient(1200px 600px at 80% -10%, rgba(212,175,106,0.12), transparent 60%),
@@ -82,14 +77,12 @@
 
 <body class="bg-stage text-gray-100 min-h-screen">
 
-  <!-- בר התקדמות -->
   <div id="progressWrap" class="sticky top-0 z-30 h-1.5 w-full bg-panel2/80 backdrop-blur">
     <div id="progressBar" class="h-full step-badge rounded-l-full" style="width:0%"></div>
   </div>
 
   <main id="formView" class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
 
-    <!-- כותרת -->
     <header class="text-center mb-8">
       <img src="logo.png" alt="ידידיה יונה — דיג'יי" width="120" height="120"
         class="logo-glow w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover" />
@@ -104,7 +97,7 @@
 
     <form id="eventForm" class="space-y-6" novalidate>
 
-      <!-- ====== 1 · פרטי האירוע ====== -->
+      <!-- 1 · פרטי האירוע -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-5">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">1</span>
@@ -160,7 +153,7 @@
         </div>
       </section>
 
-      <!-- ====== 2 · מיקום ואנשי קשר ====== -->
+      <!-- 2 · מיקום ואנשי קשר -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-5">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">2</span>
@@ -203,7 +196,7 @@
         </div>
       </section>
 
-      <!-- ====== 3 · ציוד וטכני ====== -->
+      <!-- 3 · ציוד וטכני -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-3">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">3</span>
@@ -213,7 +206,7 @@
         <div id="equipment" class="flex flex-wrap gap-2"></div>
       </section>
 
-      <!-- ====== 4 · שירי מפתח ====== -->
+      <!-- 4 · שירי מפתח -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-3">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">4</span>
@@ -281,7 +274,7 @@
         </div>
       </section>
 
-      <!-- ====== 5 · אווירה וסגנון ====== -->
+      <!-- 5 · אווירה וסגנון -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-5">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">5</span>
@@ -318,7 +311,7 @@
         </div>
       </section>
 
-      <!-- ====== 6 · חוקי הברזל ====== -->
+      <!-- 6 · חוקי הברזל -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-3">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">6</span>
@@ -351,7 +344,7 @@
         </div>
       </section>
 
-      <!-- ====== אישור ושליחה ====== -->
+      <!-- אישור ושליחה -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <label class="flex items-start gap-3 cursor-pointer">
           <input type="checkbox" name="confirm" id="confirm" class="mt-1 w-5 h-5 shrink-0" style="accent-color:#d4af6a" />
@@ -368,11 +361,11 @@
     </form>
   </main>
 
-  <!-- ====== מסך הצלחה ====== -->
+  <!-- מסך הצלחה -->
   <section id="successView" class="hidden max-w-xl mx-auto px-4 py-16 text-center">
     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full step-badge text-4xl mb-6">✓</div>
     <h2 class="text-3xl font-extrabold mb-3">מעולה, הפרטים מוכנים!</h2>
-    <p class="text-gray-400 mb-8">נשאר רק לשלוח אותם לידידיה — לחצו על הכפתור, ההודעה תיפתח מוכנה עם כל הפרטים. רק ללחוץ "שלח". 👇</p>
+    <p class="text-gray-400 mb-8">נשאר רק לשלוח אותם לידידיה — לחצו על הכפתור, ההודעה תיפתח מסודרת עם כל הפרטים. רק ללחוץ "שלח". 👇</p>
 
     <a id="whatsappBtn" href="#" target="_blank" rel="noopener"
       class="inline-flex items-center justify-center gap-3 w-full bg-[#25D366] text-[#0b1f12] font-bold text-lg rounded-2xl py-4 hover:brightness-105 active:scale-[.99] transition">
@@ -385,10 +378,11 @@
     <div class="mt-6 flex flex-col items-center gap-3">
       <button id="pdfBtn" type="button"
         class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
-        ⬇️ הורדת דף אירוע (PDF) מעוצב
+        ⬇️ הורדת דף האירוע (PDF) מסודר
       </button>
       <button id="newFormBtn" type="button" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
     </div>
+    <p class="mt-6 text-xs text-gray-500">ההודעה וה-PDF בנויים כדף עבודה לדיג'יי — תקציר, לו"ז, מוזיקה, ציוד וחוסרים לבדיקה.</p>
   </section>
 
   <div id="pdfTemplate" class="hidden-real"></div>
@@ -442,7 +436,7 @@
     form.event_type.addEventListener('change', () => { updateEventType(); onFormChange(); });
 
     // ---------- עזרים ----------
-    const esc = (s) => (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const esc = (s) => (s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const fmtDate = (d) => d ? d.split('-').reverse().join('/') : 'לא צוין';
 
     function cleanUrl(v) {
@@ -479,12 +473,12 @@
     }
 
     // ---------- איסוף נתונים ----------
-    const TEXT_FIELDS = ['event_type','couple','date','guests','reception','ceremony','age_range',
-      'venue','address','nav_link','contact_phone','contact2','venue_contact',
-      'song_opening','song_chupah','song_glass','song_slow','song_special','song_closing',
-      'artists_love','artists_avoid','dj_freedom','must_play','do_not_play','notes',
-      'reception_vibe_other','dancefloor_styles_other'];
-    const URL_FIELDS = ['nav_link','song_opening','song_chupah','song_glass','song_slow','song_special','song_closing'];
+    const TEXT_FIELDS = ['event_type', 'couple', 'date', 'guests', 'reception', 'ceremony', 'age_range',
+      'venue', 'address', 'nav_link', 'contact_phone', 'contact2', 'venue_contact',
+      'song_opening', 'song_chupah', 'song_glass', 'song_slow', 'song_special', 'song_closing',
+      'artists_love', 'artists_avoid', 'dj_freedom', 'must_play', 'do_not_play', 'notes',
+      'reception_vibe_other', 'dancefloor_styles_other'];
+    const URL_FIELDS = ['nav_link', 'song_opening', 'song_chupah', 'song_glass', 'song_slow', 'song_special', 'song_closing'];
 
     function collectData() {
       const d = {};
@@ -497,70 +491,101 @@
       return d;
     }
 
-    // ---------- הודעת וואטסאפ ----------
+    // ---------- מודיעין: רמת חופש + חוסרים ----------
+    function freedomLevel(v) {
+      if (!v) return '';
+      if (v.indexOf('חופש מלא') === 0) return 'גבוהה';
+      if (v.indexOf('איזון') === 0) return 'בינונית';
+      if (v.indexOf('שליטה') === 0) return 'נמוכה';
+      return '';
+    }
+    // חוסרים שנגזרים מהנתונים שהלקוח כן יכול היה למלא (קובעים את הודעת "הכל מולא")
+    function buildGaps(d) {
+      const wedding = WEDDING_TYPES.includes(d.event_type);
+      const g = [];
+      if (!d.nav_link) g.push('חסר קישור ניווט');
+      if (!d.contact2) g.push('חסר איש קשר גיבוי');
+      if (!d.must_play) g.push('לא הוגדרו שירי חובה');
+      if (!d.do_not_play && !d.artists_avoid) g.push('לא הוגדרו שירים אסורים');
+      if (wedding && !d.song_chupah) g.push('חסר שיר כניסה לחופה');
+      if (wedding && !d.song_slow) g.push('חסר שיר סלואו ראשון');
+      return g;
+    }
+    const VERIFY_REMINDER = 'שעת סיום · חשמל בעמדה · חניה · גישה לפריקה · מגבלות רעש';
+    const MISS = 'חסר — להשלים מול הלקוח';
+
+    // ---------- הודעת וואטסאפ (במבנה דף קרב) ----------
     const WA_MAX = 6000;
     let needsPdf = false;
     function trimList(text) {
       const lines = (text || '').split('\n').filter(l => l.trim());
       if (lines.length <= 6) return text;
-      return lines.slice(0, 6).join('\n') + '\n…(הרשימה המלאה בקובץ ה-PDF)';
-    }
-    function section(title, lines) {
-      const real = lines.filter(Boolean);
-      return real.length ? [title, ...real, ''] : [];
+      return lines.slice(0, 6).join('\n') + '\n…(הרשימה המלאה ב-PDF)';
     }
     function buildWhatsappText(d, trim) {
       const L = (label, val) => val ? `${label}: ${val}` : null;
       const join = a => a.length ? a.join(' · ') : '';
-      const must = trim ? trimList(d.must_play) : d.must_play;
-      const dnp  = trim ? trimList(d.do_not_play) : d.do_not_play;
+      const wedding = WEDDING_TYPES.includes(d.event_type);
+      const gaps = buildGaps(d);
+      const must = (trim ? trimList(d.must_play) : d.must_play);
+      const dnp = (trim ? trimList(d.do_not_play) : d.do_not_play);
+      const freedom = freedomLevel(d.dj_freedom);
+      const has = kw => d.equipment.some(x => x.indexOf(kw) !== -1);
 
-      let parts = [
-        `🎧 *תיק אירוע · ${DJ.name}*`,
-        `━━━━━━━━━━━━━━`,
-        `🎉 *${d.event_type || 'אירוע'}* — *${d.couple || ''}*`,
-        L('📅 תאריך', fmtDate(d.date)),
-        L('🕐 קבלת פנים', d.reception),
-        L('⭐ רגע מרכזי', d.ceremony),
-        d.guests ? L('👥 אורחים', d.guests) : null,
-        d.audience.length ? L('🎯 קהל', join(d.audience)) : null,
-        d.age_range ? L('🎂 גילאים', d.age_range) : null,
-        ``,
-        `📍 *מיקום*`,
-        L('• מקום', d.venue),
-        d.address ? L('• כתובת', d.address) : null,
-        d.nav_link ? L('• ניווט', d.nav_link) : null,
-        ``,
-        `📞 *אנשי קשר*`,
-        L('• ראשי', d.contact_phone),
-        d.contact2 ? L('• נוסף', d.contact2) : null,
-        d.venue_contact ? L('• אולם', d.venue_contact) : null,
-        ``,
-      ];
+      let p = [`🎧 *תיק אירוע לדיג'יי*`, `*${d.event_type || 'אירוע'}* — ${d.couple || ''}`, ``];
 
-      parts = parts.concat(section('🔊 *ציוד*', [d.equipment.length ? '• ' + join(d.equipment) : null]));
-      parts = parts.concat(section('🎵 *שירי מפתח*', [
-        L('• פתיחה / כניסה', d.song_opening),
-        L('• חופה', d.song_chupah),
-        L('• שבירת כוס', d.song_glass),
-        L('• סלואו ראשון', d.song_slow),
-        L('• רגע מיוחד', d.song_special),
-        L('• סיום', d.song_closing),
-      ]));
-      parts = parts.concat(section('🎨 *אווירה*', [
-        d.reception_vibe.length ? L('• קבלת פנים', join(d.reception_vibe)) : null,
-        d.dancefloor_styles.length ? L('• רחבה', join(d.dancefloor_styles)) : null,
-        d.dj_freedom ? L('• חופש לדיג\'יי', d.dj_freedom) : null,
-      ]));
-      parts = parts.concat(section('🎤 *אמנים*', [
-        d.artists_love ? L('• אהובים', d.artists_love) : null,
-        d.artists_avoid ? L('• להימנע', d.artists_avoid) : null,
-      ]));
-      if (must) parts = parts.concat(['✅ *חייבים להתנגן*', must, '']);
-      if (dnp) parts = parts.concat(['⛔ *אסור להשמיע*', dnp, '']);
-      if (d.notes) parts = parts.concat(['📝 *דגשים*', d.notes]);
+      // חוסרים בראש ההודעה
+      if (gaps.length) {
+        p.push('⚠️ *חוסרים לסגור לפני האירוע*');
+        gaps.forEach(x => p.push('• ' + x));
+      } else {
+        p.push('✅ *כל הפרטים הקריטיים מולאו*');
+      }
+      p.push('🔎 לוודא מול האולם: ' + VERIFY_REMINDER, '');
 
-      return parts.filter(x => x !== null).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+      // 1 · תקציר אירוע
+      p.push('━━━━━━━━', '📋 *תקציר אירוע*');
+      p.push(L('📅 תאריך', fmtDate(d.date)));
+      p.push(L('📍 מקום', d.venue));
+      if (d.address) p.push(L('🗺️ כתובת', d.address));
+      p.push('🧭 ניווט: ' + (d.nav_link || MISS));
+      if (d.guests) p.push(L('👥 אורחים', d.guests));
+      p.push('🕐 התחלה / קבלת פנים: ' + (d.reception || MISS));
+      p.push('⭐ רגע מרכזי: ' + (d.ceremony || MISS));
+      p.push(L('📞 איש קשר', d.contact_phone));
+      p.push('');
+
+      // 2 · קריטי לדיג'יי
+      p.push('━━━━━━━━', `🎯 *קריטי לדיג'יי*`);
+      if (d.audience.length) p.push(L('קהל', join(d.audience)));
+      if (d.age_range) p.push(L('גילאים', d.age_range));
+      if (d.dancefloor_styles.length) p.push(L('סגנונות', join(d.dancefloor_styles)));
+      if (freedom) p.push(`חופש לדיג'יי: ${freedom}`);
+      p.push('✅ חובה לנגן:\n' + (must || 'לא הוגדר'));
+      p.push('⛔ אסור לנגן:\n' + (dnp || 'לא הוגדר'));
+      if (d.artists_love) p.push(L('❤️ אמנים אהובים', d.artists_love));
+      if (d.artists_avoid) p.push(L('🚫 אמנים לא רצויים', d.artists_avoid));
+      p.push('');
+
+      // 3 · לו"ז
+      p.push('━━━━━━━━', '⏱️ *לו"ז האירוע*');
+      p.push('קבלת פנים: ' + (d.reception || MISS));
+      p.push('כניסה / פתיחה: ' + (d.ceremony || MISS));
+      const moments = [];
+      if (wedding) moments.push('חופה', 'שבירת כוס', 'סלואו');
+      moments.push('אוכל', 'נאומים', 'ריקודים', 'סיום');
+      p.push('⚠️ ' + MISS + ':\n' + moments.join(' · '));
+      p.push('');
+
+      // 4 · ציוד וטכני
+      p.push('━━━━━━━━', '🔊 *ציוד וטכני*');
+      p.push('הגברה: ' + (has('הגברה מלאה') ? "מלאה מהדיג'יי" : has('הגברה קבועה') ? 'קבועה במקום' : 'חסר לבדיקה'));
+      p.push('תאורה: ' + (has('תאורה') ? 'נדרשת' : 'חסר לבדיקה'));
+      p.push('מיקרופון: ' + (has('מיקרופון') ? 'אלחוטי לנאומים' : 'חסר לבדיקה'));
+      p.push('חשמל / חניה / פריקה / רעש: חסר לבדיקה');
+      if (d.notes) p.push('📝 הערות: ' + d.notes);
+
+      return p.filter(x => x !== null && x !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
     }
     function waMessage(d) {
       let text = buildWhatsappText(d, false);
@@ -569,92 +594,133 @@
       return text;
     }
 
-    // ---------- תוכן ה-PDF (דף אירוע) ----------
+    // ---------- PDF (במבנה דף קרב — עמוד 1: לוגיסטיקה, עמוד 2: מוזיקה/קהל/ציוד) ----------
     function buildPdfHtml(d) {
       const join = a => a.length ? a.join(' · ') : 'לא צוין';
+      const wedding = WEDDING_TYPES.includes(d.event_type);
+      const gaps = buildGaps(d);
+      const freedom = freedomLevel(d.dj_freedom);
+      const has = kw => d.equipment.some(x => x.indexOf(kw) !== -1);
+      const TD = 'style="page-break-inside:avoid;"';
       const row = (label, val, opt) => (opt && !val) ? '' :
-        `<tr><td style="padding:6px 0;color:#666;width:38%;vertical-align:top;">${label}</td><td style="padding:6px 0;">${esc(val) || 'לא צוין'}</td></tr>`;
+        `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;vertical-align:top;">${label}</td><td style="padding:6px 0;">${esc(val) || 'לא צוין'}</td></tr>`;
+      const missRow = (label) => `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;">${label}</td><td style="padding:6px 0;color:#c0392b;">${MISS}</td></tr>`;
+      const techRow = (label, val) => `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;">${label}</td><td style="padding:6px 0;${val ? '' : 'color:#c0392b;'}">${esc(val) || 'חסר — לבדיקה'}</td></tr>`;
       const linkRow = (label, url, opt) => (opt && !url) ? '' :
-        `<tr><td style="padding:6px 0;color:#666;width:38%;vertical-align:top;">${label}</td><td style="padding:6px 0;">${url ? `<a href="${esc(url)}" style="color:#1a73e8;word-break:break-all;">${esc(url)}</a>` : 'לא צוין'}</td></tr>`;
-      const H = (txt, color, bar) => `<h3 style="font-size:16px;color:${color};border-right:4px solid ${bar};padding-right:10px;margin:22px 0 8px;">${txt}</h3>`;
+        `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;vertical-align:top;">${label}</td><td style="padding:6px 0;">${url ? `<a href="${esc(url)}" style="color:#1a73e8;word-break:break-all;">${esc(url)}</a>` : 'לא צוין'}</td></tr>`;
+      const H = (txt, color, bar) => `<h3 style="font-size:16px;color:${color || '#b9914f'};border-right:4px solid ${bar || '#d4af6a'};padding-right:10px;margin:20px 0 8px;">${txt}</h3>`;
+      const TBL = 'style="width:100%;font-size:14px;border-collapse:collapse;"';
 
       return `
-      <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;box-sizing:border-box;width:760px;padding:40px;color:#1a1a1a;background:#fff;">
-        <div style="text-align:center;border-bottom:3px solid #d4af6a;padding-bottom:18px;margin-bottom:22px;">
-          <img src="logo.png" width="84" height="84" style="border-radius:50%;display:block;margin:0 auto 10px;" />
+      <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;box-sizing:border-box;width:760px;padding:40px;color:#1a1a1a;background:#fff;letter-spacing:0.3px;">
+        <div style="text-align:center;border-bottom:3px solid #d4af6a;padding-bottom:16px;margin-bottom:18px;">
+          <img src="logo.png" width="78" height="78" style="border-radius:50%;display:block;margin:0 auto 8px;" />
           <div style="font-size:13px;letter-spacing:3px;color:#b9914f;font-weight:700;">${esc(DJ.name)} · DJ</div>
-          <div style="font-size:28px;font-weight:800;margin-top:4px;">🎧 דף אירוע — ${esc(d.event_type) || 'אירוע'}</div>
-          <div style="font-size:19px;color:#444;margin-top:4px;">${esc(d.couple) || ''}</div>
+          <div style="font-size:26px;font-weight:800;margin-top:4px;">🎧 דף אירוע — ${esc(d.event_type) || 'אירוע'}</div>
+          <div style="font-size:18px;color:#444;margin-top:2px;">${esc(d.couple) || ''}</div>
         </div>
 
-        <div style="border:2px solid #e74c3c;border-radius:10px;padding:12px 16px;margin-bottom:8px;background:#fff8f7;">
-          <div style="font-size:13px;font-weight:700;color:#c0392b;margin-bottom:6px;">⚠️ דגשים קריטיים ליום האירוע</div>
-          <table style="width:100%;font-size:14px;border-collapse:collapse;">
-            ${row('תאריך', fmtDate(d.date))}
-            ${row('מקום', d.venue)}
-            ${row('כתובת', d.address, true)}
-            ${linkRow('ניווט', d.nav_link, true)}
-            ${row('שעת קבלת פנים', d.reception)}
-            ${row('שעת רגע מרכזי', d.ceremony)}
-            ${row('איש קשר ראשי', d.contact_phone)}
-          </table>
+        <div style="border:2px solid #e74c3c;border-radius:10px;padding:12px 16px;margin-bottom:14px;background:#fff8f7;page-break-inside:avoid;">
+          <div style="font-size:14px;font-weight:800;color:#c0392b;margin-bottom:6px;">⚠️ חוסרים שצריך לסגור לפני האירוע</div>
+          ${gaps.length
+            ? `<div style="font-size:14px;line-height:1.85;">${gaps.map(g => '◆ ' + esc(g)).join('<br>')}</div>`
+            : '<div style="font-size:14px;color:#1a8a4a;font-weight:700;">✅ כל הפרטים הקריטיים מולאו</div>'}
+          <div style="font-size:12px;color:#777;margin-top:8px;border-top:1px dashed #f0c9c4;padding-top:6px;">🔎 לוודא מול האולם: ${VERIFY_REMINDER}</div>
         </div>
 
-        ${H('פרטי האירוע', '#b9914f', '#d4af6a')}
-        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+        ${H('תקציר אירוע')}
+        <table ${TBL}>
+          ${row('סוג אירוע', d.event_type)}
+          ${row('שמות החוגגים', d.couple)}
+          ${row('תאריך', fmtDate(d.date))}
+          ${row('מקום', d.venue)}
+          ${row('כתובת', d.address, true)}
+          ${linkRow('קישור ניווט', d.nav_link, true)}
           ${row('כמות אורחים', d.guests, true)}
-          ${row('אופי הקהל', d.audience.length ? join(d.audience) : '', true)}
-          ${row('טווח גילאים', d.age_range, true)}
+          ${row('שעת התחלה / קבלת פנים', d.reception)}
+          ${row('שעת רגע מרכזי', d.ceremony)}
         </table>
 
-        ${H('אנשי קשר', '#b9914f', '#d4af6a')}
-        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+        ${H('אנשי קשר')}
+        <table ${TBL}>
           ${row('ראשי', d.contact_phone)}
           ${row('נוסף (גיבוי)', d.contact2, true)}
           ${row('אולם / מנהל אירוע', d.venue_contact, true)}
         </table>
 
-        ${d.equipment.length ? H('ציוד וטכני', '#b9914f', '#d4af6a') + `<div style="font-size:14px;line-height:1.9;">${esc(join(d.equipment))}</div>` : ''}
+        ${H('לו"ז האירוע')}
+        <table ${TBL}>
+          ${row('קבלת פנים', d.reception)}
+          ${row('כניסה / פתיחה', d.ceremony)}
+          ${wedding ? missRow('חופה') + missRow('שבירת כוס') + missRow('סלואו ראשון') : ''}
+          ${missRow('אוכל')}${missRow('נאומים')}${missRow('ריקודים')}${missRow('סיום אירוע')}
+        </table>
 
-        ${H('שירי מפתח', '#b9914f', '#d4af6a')}
-        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+        <div style="page-break-before:always;"></div>
+
+        ${H('✅ מוזיקה חובה ' + ltrIso('(Must Play)'), '#1a8a4a', '#25D366')}
+        <div style="font-size:14px;line-height:1.9;">${d.must_play ? linkify(d.must_play) : '<span style="color:#c0392b;">לא הוגדרו שירי חובה</span>'}</div>
+
+        ${H('⛔ מוזיקה אסורה ' + ltrIso('(Do Not Play)'), '#c0392b', '#e74c3c')}
+        <div style="font-size:14px;line-height:1.9;">${d.do_not_play ? linkify(d.do_not_play) : '<span style="color:#c0392b;">לא הוגדרו שירים אסורים</span>'}</div>
+
+        ${H('שירי מפתח')}
+        <table ${TBL}>
           ${linkRow('כניסה / פתיחה', d.song_opening, true)}
           ${linkRow('כניסה לחופה', d.song_chupah, true)}
           ${linkRow('שבירת כוס', d.song_glass, true)}
           ${linkRow('סלואו ראשון', d.song_slow, true)}
           ${linkRow('רגע מיוחד', d.song_special, true)}
           ${linkRow('סיום', d.song_closing, true)}
-        </table>
-
-        ${H('אווירה וסגנון', '#b9914f', '#d4af6a')}
-        <table style="width:100%;font-size:14px;border-collapse:collapse;">
-          ${row('אווירה בקבלת הפנים', d.reception_vibe.length ? join(d.reception_vibe) : '', true)}
-          ${row('סגנונות לרחבה', d.dancefloor_styles.length ? join(d.dancefloor_styles) : '', true)}
-          ${row('רמת חופש לדיג\'יי', d.dj_freedom, true)}
           ${row('אמנים אהובים', d.artists_love, true)}
           ${row('אמנים לא רצויים', d.artists_avoid, true)}
         </table>
 
-        ${H('✅ חייבים להתנגן ' + ltrIso('(Must Play)'), '#1a8a4a', '#25D366')}
-        <div style="font-size:14px;line-height:1.9;">${d.must_play ? linkify(d.must_play) : '<span style="color:#999;">לא צוין</span>'}</div>
+        ${H('אופי הקהל')}
+        <table ${TBL}>
+          ${row('קהל', d.audience.length ? join(d.audience) : '', true)}
+          ${row('טווח גילאים', d.age_range, true)}
+          ${row('סגנונות לרחבה', d.dancefloor_styles.length ? join(d.dancefloor_styles) : '', true)}
+          ${row('אווירת קבלת פנים', d.reception_vibe.length ? join(d.reception_vibe) : '', true)}
+          ${row("רמת חופש לדיג'יי", freedom ? freedom + (d.dj_freedom ? ' (' + d.dj_freedom + ')' : '') : '', true)}
+        </table>
 
-        ${H('⛔ הרשימה השחורה ' + ltrIso('(Do Not Play)'), '#c0392b', '#e74c3c')}
-        <div style="font-size:14px;line-height:1.9;">${d.do_not_play ? linkify(d.do_not_play) : '<span style="color:#999;">לא צוין</span>'}</div>
+        ${H('ציוד וטכני')}
+        <table ${TBL}>
+          ${techRow('הגברה', has('הגברה מלאה') ? "מלאה מהדיג'יי" : has('הגברה קבועה') ? 'קבועה במקום' : '')}
+          ${techRow('תאורה', has('תאורה') ? 'נדרשת לרחבה' : '')}
+          ${techRow('מיקרופון', has('מיקרופון') ? 'אלחוטי לנאומים' : '')}
+          ${techRow('חשמל בעמדה', '')}
+          ${techRow("חניה לדיג'יי", '')}
+          ${techRow('גישה לפריקה', '')}
+          ${techRow('מגבלות רעש', '')}
+          ${has('בחוץ') ? row('אירוע בחוץ / משולב', 'כן') : ''}
+        </table>
 
-        ${d.notes ? H('דגשים ובקשות מיוחדות', '#b9914f', '#d4af6a') + `<div style="font-size:14px;line-height:1.9;">${linkify(d.notes)}</div>` : ''}
+        ${d.notes ? H('הערות ודגשים') + `<div style="font-size:14px;line-height:1.9;">${linkify(d.notes)}</div>` : ''}
 
-        <div style="margin-top:30px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:12px;">
+        <div style="margin-top:26px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:12px;">
           הופק עבור ${esc(DJ.name)} · נוצר בתאריך ${new Date().toLocaleDateString('he-IL')}
         </div>
       </div>`;
     }
 
     // ---------- שמירת טיוטה ----------
-    function saveDraft() {
+    function getDraftObject() {
       const d = {};
       TEXT_FIELDS.forEach(n => { d[n] = form[n].value; });
       CHIP_GROUPS.forEach(g => { d[g] = getChecked(g); });
-      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (e) {}
+      return d;
+    }
+    function applyDraftObject(d) {
+      if (!d) return;
+      TEXT_FIELDS.forEach(n => { if (form[n] && typeof d[n] === 'string') form[n].value = d[n]; });
+      CHIP_GROUPS.forEach(g => (d[g] || []).forEach(v => setChecked(g, v)));
+      toggleOther('reception_vibe'); toggleOther('dancefloor_styles');
+      updateEventType();
+    }
+    function saveDraft() {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(getDraftObject())); } catch (e) {}
     }
     function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
     function setChecked(group, val) {
@@ -663,11 +729,7 @@
     }
     function restoreDraft() {
       let d; try { d = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch (e) { return; }
-      if (!d) return;
-      TEXT_FIELDS.forEach(n => { if (form[n] && typeof d[n] === 'string') form[n].value = d[n]; });
-      CHIP_GROUPS.forEach(g => (d[g] || []).forEach(v => setChecked(g, v)));
-      toggleOther('reception_vibe'); toggleOther('dancefloor_styles');
-      updateEventType();
+      applyDraftObject(d);
     }
 
     // ---------- בר התקדמות ----------
@@ -701,6 +763,7 @@
       const btn = document.getElementById('pdfBtn');
       const orig = btn.textContent;
       btn.textContent = 'מפיק PDF... ⏳'; btn.disabled = true;
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
 
       const tpl = document.getElementById('pdfTemplate');
       tpl.innerHTML = buildPdfHtml(d);
@@ -715,7 +778,7 @@
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-          pagebreak: { mode: ['css', 'legacy'] },
+          pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', 'h3'] },
           enableLinks: true,
         }).from(node).save();
       } catch (err) {
@@ -735,7 +798,7 @@
       setTimeout(() => { el.style.borderColor = ''; }, 2500);
     }
     function validate() {
-      const required = ['event_type','couple','date','venue','reception','ceremony','contact_phone'];
+      const required = ['event_type', 'couple', 'date', 'venue', 'reception', 'ceremony', 'contact_phone'];
       for (const n of required) {
         if (!form[n].value.trim()) { flashError(form[n]); return false; }
       }
