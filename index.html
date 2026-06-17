@@ -176,18 +176,21 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm text-gray-300 mb-1.5">קישור לשיר כניסה לחופה</label>
-            <input type="url" name="song_entrance" placeholder="https://..."
-              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+            <input type="url" name="song_entrance" placeholder="https://..." inputmode="url"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
           </div>
           <div>
             <label class="block text-sm text-gray-300 mb-1.5">קישור לשיר שבירת כוס</label>
-            <input type="url" name="song_glass" placeholder="https://..."
-              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+            <input type="url" name="song_glass" placeholder="https://..." inputmode="url"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
           </div>
           <div>
             <label class="block text-sm text-gray-300 mb-1.5">קישור לשיר סלואו ראשון</label>
-            <input type="url" name="song_slow" placeholder="https://..."
-              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+            <input type="url" name="song_slow" placeholder="https://..." inputmode="url"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
           </div>
         </div>
       </section>
@@ -319,6 +322,22 @@
     // ---------- עזרי עיבוד ----------
     const esc = (s) => (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const fmtDate = (d) => d ? d.split('-').reverse().join('/') : 'לא צוין';
+
+    // מחלץ קישור נקי בלבד — הגנה מפני מילוי-אוטומטי של הדפדפן שמזריק טקסט מהדף
+    function cleanUrl(v) {
+      v = (v || '').trim();
+      if (!v) return '';
+      const m = v.match(/https?:\/\/\S+/i);   // הקישור הראשון בלבד (עד הרווח הראשון)
+      if (m) return m[0];
+      return v.split(/\s+/)[0];               // אם אין http — המילה הראשונה בלבד
+    }
+    // ניקוי עצמי של שדה הקישור ברגע שיוצאים ממנו
+    document.querySelectorAll('.song-url').forEach(el => {
+      el.addEventListener('blur', () => {
+        const cleaned = cleanUrl(el.value);
+        if (cleaned !== el.value) { el.value = cleaned; saveDraft(); }
+      });
+    });
 
     function getChecked(name) {
       return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
@@ -458,9 +477,9 @@
         reception: f.reception.value,
         ceremony: f.ceremony.value,
         contact_phone: f.contact_phone.value.trim(),
-        song_entrance: f.song_entrance.value.trim(),
-        song_glass: f.song_glass.value.trim(),
-        song_slow: f.song_slow.value.trim(),
+        song_entrance: cleanUrl(f.song_entrance.value),
+        song_glass: cleanUrl(f.song_glass.value),
+        song_slow: cleanUrl(f.song_slow.value),
         reception_vibe: withOther(getChecked('reception_vibe'), f.reception_vibe_other.value),
         dancefloor_styles: withOther(getChecked('dancefloor_styles'), f.dancefloor_styles_other.value),
         must_play: f.must_play.value.trim(),
@@ -542,8 +561,9 @@
           margin: 0,
           filename: `תיק-אירוע-${safeName}.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 800 },
           jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] },
           enableLinks: true,
         }).from(node).save();
       } catch (err) {
