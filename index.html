@@ -4,7 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>איפיון אירוע · ידידיה יונה</title>
-  <meta name="description" content="טופס איפיון אירוע — מלאו את כל הפרטים והפרטים יישלחו ישירות לדיג'יי ידידיה יונה" />
+  <meta name="description" content="טופס איפיון אירוע — מלאו את כל הפרטים והם יישלחו ישירות לדיג'יי ידידיה יונה" />
+
+  <!-- favicon + תצוגה מקדימה בשיתוף (OG) -->
+  <link rel="icon" href="logo.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
+  <meta property="og:title" content="איפיון אירוע · ידידיה יונה" />
+  <meta property="og:description" content="מלאו את פרטי האירוע — הכל יישלח ישירות לדיג'יי בלחיצה אחת" />
+  <meta property="og:image" content="logo.png" />
+  <meta property="og:type" content="website" />
 
   <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,6 +24,8 @@
 
   <!-- ייצור PDF בצד-לקוח (אופציונלי) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+  <!-- קונפטי למסך ההצלחה -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -45,18 +55,16 @@
         #0b0b12;
     }
     .ltr { direction: ltr; unicode-bidi: isolate; text-align: left; }
-    input[type="time"], input[type="date"], input[type="url"] { direction: ltr; text-align: start; }
-    /* checkbox מותאם */
-    .chip {
-      transition: all .15s ease;
-      user-select: none;
-    }
-    .chip input { display: none; }
-    .chip.checked {
-      background: linear-gradient(180deg, rgba(212,175,106,0.22), rgba(212,175,106,0.10));
-      border-color: #d4af6a;
-      color: #e8d3a0;
-    }
+    input[type="time"], input[type="date"], input[type="url"], input[type="tel"] { direction: ltr; text-align: start; }
+
+    /* checkbox מותאם (צ'יפ) */
+    .chip { transition: all .15s ease; user-select: none; }
+    .chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .chip .chk { display: none; font-weight: 700; }
+    .chip.checked { background: linear-gradient(180deg, rgba(212,175,106,0.22), rgba(212,175,106,0.10)); border-color: #d4af6a; color: #e8d3a0; }
+    .chip.checked .chk { display: inline; }
+    .chip:focus-within { outline: 2px solid rgba(212,175,106,0.6); outline-offset: 2px; }
+
     .field {
       background: #1d1d2b;
       border: 1px solid #2a2a3c;
@@ -67,36 +75,50 @@
       border-color: #d4af6a;
       box-shadow: 0 0 0 3px rgba(212,175,106,0.15);
     }
-    .step-badge {
-      background: linear-gradient(180deg, #d4af6a, #b9914f);
-      color: #0b0b12;
-    }
+    .step-badge { background: linear-gradient(180deg, #d4af6a, #b9914f); color: #0b0b12; }
     ::placeholder { color: #6b6b80; }
     .hidden-real { position:absolute; left:-9999px; }
-    /* זוהר עדין סביב הלוגו */
-    .logo-glow { box-shadow: 0 0 0 1px rgba(212,175,106,0.35), 0 8px 40px rgba(212,175,106,0.25); }
-    /* גלילה חלקה */
     html { scroll-behavior: smooth; }
+
+    /* הילת לוגו מתנשמת */
+    @keyframes logoPulse {
+      0%,100% { box-shadow: 0 0 0 1px rgba(212,175,106,.35), 0 8px 36px rgba(212,175,106,.18); }
+      50%     { box-shadow: 0 0 0 1px rgba(212,175,106,.65), 0 12px 52px rgba(212,175,106,.42); }
+    }
+    .logo-glow { animation: logoPulse 3.6s ease-in-out infinite; }
+
+    /* כניסה מדורגת של החלקים */
+    .reveal { opacity: 0; transform: translateY(18px); }
+    .reveal.in { opacity: 1; transform: none; transition: opacity .5s ease, transform .5s ease; }
+
+    /* בר התקדמות */
+    #progressBar { transition: width .45s cubic-bezier(.4,0,.2,1); }
   </style>
 </head>
 
 <body class="bg-stage text-gray-100 min-h-screen">
+
+  <!-- בר התקדמות צמוד למעלה -->
+  <div id="progressWrap" class="sticky top-0 z-30 h-1.5 w-full bg-panel2/80 backdrop-blur">
+    <div id="progressBar" class="h-full step-badge rounded-l-full" style="width:0%"></div>
+  </div>
 
   <!-- ====== הטופס ====== -->
   <main id="formView" class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
 
     <!-- כותרת + מיתוג הדיג'יי -->
     <header class="text-center mb-10">
-      <img src="logo.png" alt="ידידיה יונה — דיג'יי" width="112" height="112"
-        class="logo-glow w-28 h-28 rounded-full mx-auto mb-4 object-cover" />
+      <img src="logo.png" alt="ידידיה יונה — דיג'יי" width="120" height="120"
+        class="logo-glow w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover" />
       <div class="text-gold text-sm tracking-[0.3em] font-semibold mb-1">ידידיה יונה · DJ</div>
       <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">איפיון אירוע</h1>
       <p class="text-gray-400 mt-2 max-w-xl mx-auto">
         מלאו את כל הפרטים בקפידה — בסיום הכל יישלח ישירות לידידיה בלחיצה אחת.
       </p>
+      <p class="text-xs text-gray-500 mt-3">🔒 כל מה שתמלאו נשמר אוטומטית במכשיר שלכם — אפשר לחזור ולהמשיך מתי שתרצו.</p>
     </header>
 
-    <form id="eventForm" class="space-y-6">
+    <form id="eventForm" class="space-y-6" novalidate>
 
       <!-- ====== חלק 1 ====== -->
       <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
@@ -180,11 +202,19 @@
         <div class="mb-6">
           <label class="block text-sm font-semibold text-goldsoft mb-3">אווירה בקבלת הפנים</label>
           <div id="reception_vibe" class="flex flex-wrap gap-2"></div>
+          <div id="reception_vibe_other_wrap" class="hidden mt-3">
+            <input type="text" name="reception_vibe_other" placeholder="פרטו את ה'אחר'..."
+              class="field w-full rounded-xl px-4 py-2.5 text-gray-100" />
+          </div>
         </div>
 
         <div>
           <label class="block text-sm font-semibold text-goldsoft mb-3">סגנונות לרחבת הריקודים</label>
           <div id="dancefloor_styles" class="flex flex-wrap gap-2"></div>
+          <div id="dancefloor_styles_other_wrap" class="hidden mt-3">
+            <input type="text" name="dancefloor_styles_other" placeholder="פרטו את ה'אחר'..."
+              class="field w-full rounded-xl px-4 py-2.5 text-gray-100" />
+          </div>
         </div>
       </section>
 
@@ -213,12 +243,12 @@
         </div>
       </section>
 
-      <!-- כפתור -->
+      <!-- כפתור (צף בתחתית בנייד) -->
       <button type="submit"
-        class="w-full step-badge font-bold text-lg rounded-2xl py-4 hover:brightness-110 active:scale-[.99] transition">
+        class="sticky bottom-4 z-20 w-full step-badge font-bold text-lg rounded-2xl py-4 shadow-xl shadow-black/40 hover:brightness-110 active:scale-[.99] transition">
         סיום ושליחה לידידיה 🎉
       </button>
-      <p class="text-center text-xs text-gray-500 pb-4">הפרטים נשלחים אליכם בלבד לידידיה — אין שמירה בשרת.</p>
+      <p class="text-center text-xs text-gray-500 pb-4">הפרטים נשלחים ישירות לידידיה בלבד — אין שמירה בשרת.</p>
     </form>
   </main>
 
@@ -234,12 +264,14 @@
       שלחו את פרטי האירוע לידידיה בוואטסאפ
     </a>
 
+    <p id="pdfNote" class="hidden text-xs text-goldsoft mt-4">📎 הרשימות שלכם ארוכות — מומלץ גם להוריד את ה-PDF ולצרף אותו להודעה.</p>
+
     <div class="mt-6 flex flex-col items-center gap-3">
       <button id="pdfBtn" type="button"
         class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
         ⬇️ הורדת עותק PDF מעוצב (אופציונלי)
       </button>
-      <button onclick="location.reload()" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
+      <button id="newFormBtn" type="button" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
     </div>
   </section>
 
@@ -252,6 +284,8 @@
       name: 'ידידיה יונה',
       phone: '972535918939', // 053-591-8939 בפורמט בינלאומי לוואטסאפ
     };
+    const DRAFT_KEY = 'dj_event_draft_v1';
+    const form = document.getElementById('eventForm');
 
     // ---------- אפשרויות הצ'ק-בוקסים ----------
     const RECEPTION = ['צ\'יל אאוט', 'ג\'אז', 'דיפ האוס', 'רוק רך', 'ישראלי שקט', 'אחר'];
@@ -263,50 +297,69 @@
         const id = groupName + '_' + i;
         const label = document.createElement('label');
         label.className = 'chip cursor-pointer rounded-full border border-line bg-panel2 px-4 py-2 text-sm text-gray-300';
-        label.innerHTML = `<input type="checkbox" name="${groupName}" value="${opt}" id="${id}"><span>${opt}</span>`;
+        label.innerHTML = `<input type="checkbox" name="${groupName}" value="${opt}" id="${id}"><span class="chk">✓ </span><span>${opt}</span>`;
         const input = label.querySelector('input');
-        input.addEventListener('change', () => label.classList.toggle('checked', input.checked));
+        input.addEventListener('change', () => {
+          label.classList.toggle('checked', input.checked);
+          if (opt === 'אחר') toggleOther(groupName);
+          onFormChange();
+        });
         wrap.appendChild(label);
       });
     }
     buildChips('reception_vibe', RECEPTION, 'reception_vibe');
     buildChips('dancefloor_styles', DANCEFLOOR, 'dancefloor_styles');
 
+    function toggleOther(group) {
+      const wrap = document.getElementById(group + '_other_wrap');
+      const other = document.querySelector(`input[name="${group}"][value="אחר"]`);
+      wrap.classList.toggle('hidden', !(other && other.checked));
+    }
+
     // ---------- עזרי עיבוד ----------
     const esc = (s) => (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     const fmtDate = (d) => d ? d.split('-').reverse().join('/') : 'לא צוין';
 
-    function linkify(text) {
-      return esc(text)
-        .split('\n')
-        .map(line => {
-          const t = line.trim();
-          if (!t) return '';
-          const urlMatch = t.match(/^(https?:\/\/\S+)$/);
-          if (urlMatch) {
-            return `<div><a href="${urlMatch[1]}" style="color:#1a73e8;word-break:break-all;">${urlMatch[1]}</a></div>`;
-          }
-          const withLinks = t.replace(/(https?:\/\/\S+)/g, '<a href="$1" style="color:#1a73e8;word-break:break-all;">$1</a>');
-          return `<div>${withLinks}</div>`;
-        })
-        .join('');
+    function getChecked(name) {
+      return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
+    }
+    // משלב את טקסט ה'אחר' בתוך רשימת הבחירות
+    function withOther(arr, otherVal) {
+      const t = (otherVal || '').trim();
+      return arr.map(v => v === 'אחר' ? (t ? 'אחר: ' + t : 'אחר') : v);
     }
 
+    function linkify(text) {
+      return esc(text).split('\n').map(line => {
+        const t = line.trim();
+        if (!t) return '';
+        const urlMatch = t.match(/^(https?:\/\/\S+)$/);
+        if (urlMatch) return `<div><a href="${urlMatch[1]}" style="color:#1a73e8;word-break:break-all;">${urlMatch[1]}</a></div>`;
+        const withLinks = t.replace(/(https?:\/\/\S+)/g, '<a href="$1" style="color:#1a73e8;word-break:break-all;">$1</a>');
+        return `<div>${withLinks}</div>`;
+      }).join('');
+    }
     function linkRow(label, url) {
       if (!url) return `<tr><td style="padding:6px 0;color:#666;width:42%;">${label}</td><td style="padding:6px 0;color:#aaa;">לא צוין</td></tr>`;
       return `<tr><td style="padding:6px 0;color:#666;width:42%;">${label}</td><td style="padding:6px 0;"><a href="${esc(url)}" style="color:#1a73e8;word-break:break-all;">${esc(url)}</a></td></tr>`;
     }
 
-    function getChecked(name) {
-      return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
+    // ---------- הודעת וואטסאפ (עם הגנת אורך) ----------
+    const WA_MAX = 1900; // מגבלה בטוחה לאורך ה-URL בדפדפנים
+    let needsPdf = false;
+
+    function trimList(text) {
+      const lines = (text || '').split('\n').filter(l => l.trim());
+      if (lines.length <= 6) return text;
+      return lines.slice(0, 6).join('\n') + '\n…(הרשימה המלאה בקובץ ה-PDF המצורף)';
     }
 
-    // ---------- בניית הודעת הוואטסאפ (כל הפרטים + קישורים לחיצים) ----------
-    function buildWhatsappText(d) {
+    function buildWhatsappText(d, trim) {
       const recVibe = d.reception_vibe.length ? d.reception_vibe.join(' · ') : 'לא צוין';
       const dance = d.dancefloor_styles.length ? d.dancefloor_styles.join(' · ') : 'לא צוין';
       const line = (label, val) => `${label}: ${val || '—'}`;
-      const block = (text) => (text ? text : '—');
+      const must = trim ? trimList(d.must_play) : (d.must_play || '—');
+      const dnp  = trim ? trimList(d.do_not_play) : (d.do_not_play || '—');
 
       const parts = [
         `🎧 *תיק אירוע · ${DJ.name}*`,
@@ -328,16 +381,26 @@
         line('• רחבת ריקודים', dance),
         ``,
         `✅ *חייבים להתנגן (Must Play)*`,
-        block(d.must_play),
+        must || '—',
         ``,
         `⛔ *אסור להשמיע (Do Not Play)*`,
-        block(d.do_not_play),
+        dnp || '—',
       ].filter(x => x !== null);
 
       return parts.join('\n');
     }
 
-    // ---------- בניית תוכן ה-PDF ----------
+    function waMessage(d) {
+      let text = buildWhatsappText(d, false);
+      needsPdf = false;
+      if (encodeURIComponent(text).length > WA_MAX) {
+        text = buildWhatsappText(d, true);
+        needsPdf = true;
+      }
+      return text;
+    }
+
+    // ---------- תוכן ה-PDF ----------
     function buildPdfHtml(d) {
       const recVibe = d.reception_vibe.length ? d.reception_vibe.join(' · ') : 'לא צוין';
       const dance = d.dancefloor_styles.length ? d.dancefloor_styles.join(' · ') : 'לא צוין';
@@ -385,28 +448,99 @@
       </div>`;
     }
 
-    // ---------- מצב נוכחי (נשמר לאחר שליחה לצורך הורדת PDF) ----------
-    let currentData = null;
+    // ---------- איסוף נתוני הטופס ----------
+    function collectData() {
+      const f = form;
+      return {
+        couple: f.couple.value.trim(),
+        date: f.date.value,
+        venue: f.venue.value.trim(),
+        reception: f.reception.value,
+        ceremony: f.ceremony.value,
+        contact_phone: f.contact_phone.value.trim(),
+        song_entrance: f.song_entrance.value.trim(),
+        song_glass: f.song_glass.value.trim(),
+        song_slow: f.song_slow.value.trim(),
+        reception_vibe: withOther(getChecked('reception_vibe'), f.reception_vibe_other.value),
+        dancefloor_styles: withOther(getChecked('dancefloor_styles'), f.dancefloor_styles_other.value),
+        must_play: f.must_play.value.trim(),
+        do_not_play: f.do_not_play.value.trim(),
+      };
+    }
+
+    // ---------- שמירת טיוטה (localStorage) ----------
+    const DRAFT_FIELDS = ['couple','date','venue','reception','ceremony','contact_phone',
+      'song_entrance','song_glass','song_slow','must_play','do_not_play',
+      'reception_vibe_other','dancefloor_styles_other'];
+
+    function saveDraft() {
+      const d = {};
+      DRAFT_FIELDS.forEach(n => { if (form[n]) d[n] = form[n].value; });
+      d.reception_vibe = getChecked('reception_vibe');
+      d.dancefloor_styles = getChecked('dancefloor_styles');
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (e) {}
+    }
+    function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+
+    function restoreDraft() {
+      let d; try { d = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch (e) { return; }
+      if (!d) return;
+      DRAFT_FIELDS.forEach(n => { if (form[n] && typeof d[n] === 'string') form[n].value = d[n]; });
+      (d.reception_vibe || []).forEach(v => setChecked('reception_vibe', v));
+      (d.dancefloor_styles || []).forEach(v => setChecked('dancefloor_styles', v));
+      toggleOther('reception_vibe');
+      toggleOther('dancefloor_styles');
+    }
+    function setChecked(group, val) {
+      const el = document.querySelector(`input[name="${group}"][value="${CSS.escape(val)}"]`);
+      if (el) { el.checked = true; el.closest('.chip').classList.add('checked'); }
+    }
+
+    // ---------- בר התקדמות ----------
+    function updateProgress() {
+      const f = form;
+      const milestones = [
+        () => f.couple.value.trim(),
+        () => f.date.value,
+        () => f.venue.value.trim(),
+        () => f.reception.value,
+        () => f.ceremony.value,
+        () => f.song_entrance.value.trim() || f.song_glass.value.trim() || f.song_slow.value.trim(),
+        () => getChecked('reception_vibe').length || getChecked('dancefloor_styles').length,
+        () => f.must_play.value.trim() || f.do_not_play.value.trim(),
+      ];
+      const done = milestones.filter(fn => fn()).length;
+      const pct = Math.round(done / milestones.length * 100);
+      document.getElementById('progressBar').style.width = pct + '%';
+    }
+
+    // ---------- שינוי בטופס → שמירה + התקדמות ----------
+    let saveTimer = null;
+    function onFormChange() {
+      updateProgress();
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveDraft, 300);
+    }
+    form.addEventListener('input', onFormChange);
 
     // ---------- הורדת PDF לפי דרישה ----------
+    let currentData = null;
     async function downloadPdf() {
-      if (!currentData) return;
+      const d = currentData || collectData();
       const btn = document.getElementById('pdfBtn');
       const orig = btn.textContent;
       btn.textContent = 'מפיק PDF... ⏳';
       btn.disabled = true;
 
       const tpl = document.getElementById('pdfTemplate');
-      tpl.innerHTML = buildPdfHtml(currentData);
+      tpl.innerHTML = buildPdfHtml(d);
       const node = tpl.firstElementChild;
-
-      const safeName = (currentData.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
-      const fileName = `תיק-אירוע-${safeName}.pdf`;
+      const safeName = (d.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
 
       try {
         await html2pdf().set({
           margin: 0,
-          filename: fileName,
+          filename: `תיק-אירוע-${safeName}.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
@@ -421,38 +555,72 @@
     }
     document.getElementById('pdfBtn').addEventListener('click', downloadPdf);
 
-    // ---------- שליחה ----------
-    document.getElementById('eventForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const f = e.target;
+    // ---------- ולידציה ידנית (כי novalidate) ----------
+    function validate() {
+      const required = ['couple','date','venue','reception','ceremony'];
+      for (const n of required) {
+        if (!form[n].value.trim()) {
+          form[n].focus();
+          form[n].classList.add('field');
+          form[n].style.borderColor = '#e74c3c';
+          form[n].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => { form[n].style.borderColor = ''; }, 2500);
+          return false;
+        }
+      }
+      return true;
+    }
 
-      const data = {
-        couple: f.couple.value.trim(),
-        date: f.date.value,
-        venue: f.venue.value.trim(),
-        reception: f.reception.value,
-        ceremony: f.ceremony.value,
-        contact_phone: f.contact_phone.value.trim(),
-        song_entrance: f.song_entrance.value.trim(),
-        song_glass: f.song_glass.value.trim(),
-        song_slow: f.song_slow.value.trim(),
-        reception_vibe: getChecked('reception_vibe'),
-        dancefloor_styles: getChecked('dancefloor_styles'),
-        must_play: f.must_play.value.trim(),
-        do_not_play: f.do_not_play.value.trim(),
-      };
+    // ---------- שליחה ----------
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!validate()) return;
+
+      const data = collectData();
       currentData = data;
 
-      // בניית קישור וואטסאפ ישיר לדיג'יי עם כל הפרטים
-      const waText = buildWhatsappText(data);
-      const waLink = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(waText)}`;
+      const waLink = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(waMessage(data))}`;
       document.getElementById('whatsappBtn').href = waLink;
+      document.getElementById('pdfNote').classList.toggle('hidden', !needsPdf);
 
-      // מעבר למסך הצלחה
+      // מעבר למסך הצלחה + קונפטי
       document.getElementById('formView').classList.add('hidden');
       document.getElementById('successView').classList.remove('hidden');
       window.scrollTo(0, 0);
+      fireConfetti();
     });
+
+    // הטיוטה נמחקת ברגע שהלקוח לוחץ "שלח בוואטסאפ"
+    document.getElementById('whatsappBtn').addEventListener('click', clearDraft);
+    document.getElementById('newFormBtn').addEventListener('click', () => { clearDraft(); location.reload(); });
+
+    // ---------- קונפטי ----------
+    function fireConfetti() {
+      if (typeof confetti !== 'function') return;
+      const colors = ['#d4af6a', '#e8d3a0', '#ffffff', '#b9914f'];
+      confetti({ particleCount: 90, spread: 75, origin: { y: 0.35 }, colors });
+      setTimeout(() => confetti({ particleCount: 50, angle: 60, spread: 60, origin: { x: 0 }, colors }), 200);
+      setTimeout(() => confetti({ particleCount: 50, angle: 120, spread: 60, origin: { x: 1 }, colors }), 350);
+    }
+
+    // ---------- כניסה מדורגת של החלקים ----------
+    (function reveal() {
+      const sections = document.querySelectorAll('#eventForm section');
+      if (!('IntersectionObserver' in window)) return;
+      sections.forEach((s, i) => { s.classList.add('reveal'); s.style.transitionDelay = (i * 60) + 'ms'; });
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+      }, { threshold: 0.08 });
+      sections.forEach(s => io.observe(s));
+    })();
+
+    // ---------- אתחול ----------
+    (function init() {
+      // לא לאפשר תאריך עבר
+      form.date.min = new Date().toISOString().split('T')[0];
+      restoreDraft();
+      updateProgress();
+    })();
   </script>
 </body>
 </html>
