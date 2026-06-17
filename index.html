@@ -389,14 +389,9 @@
       </button>
     </div>
 
-    <div class="mt-8 pt-6 border-t border-line text-center">
-      <div class="text-gold text-xs tracking-[0.25em] font-semibold mb-3">— אזור הדיג'יי —</div>
-      <button id="battleBtn" type="button"
-        class="inline-flex items-center justify-center gap-2 w-full bg-panel2 border border-gold/50 text-goldsoft font-bold text-lg rounded-2xl py-4 hover:bg-panel hover:border-gold transition">
-        🎯 צור דף קרב לדיג'יי
-      </button>
-      <p class="text-xs text-gray-500 mt-2">סיכום עבודה מקצועי לדיג'יי — לו"ז, אנשי קשר, שירים וחוסרים לבדיקה לפני האירוע.</p>
-    </div>
+    <p class="mt-8 pt-6 border-t border-line text-xs text-gray-500">
+      🎯 בהודעה לידידיה מצורף גם <b class="text-goldsoft">לינק "דף קרב"</b> — כלי עבודה פנימי שנפתח אצל הדיג'יי בלבד.
+    </p>
 
     <button id="newFormBtn" type="button" class="mt-6 text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
   </section>
@@ -682,12 +677,22 @@
       </div>`;
     }
 
-    // ---------- שמירת טיוטה ----------
-    function saveDraft() {
+    // ---------- שמירת טיוטה / סנכרון נתונים ----------
+    function getDraftObject() {
       const d = {};
       TEXT_FIELDS.forEach(n => { d[n] = form[n].value; });
       CHIP_GROUPS.forEach(g => { d[g] = getChecked(g); });
-      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (e) {}
+      return d;
+    }
+    function applyDraftObject(d) {
+      if (!d) return;
+      TEXT_FIELDS.forEach(n => { if (form[n] && typeof d[n] === 'string') form[n].value = d[n]; });
+      CHIP_GROUPS.forEach(g => (d[g] || []).forEach(v => setChecked(g, v)));
+      toggleOther('reception_vibe'); toggleOther('dancefloor_styles');
+      updateEventType();
+    }
+    function saveDraft() {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(getDraftObject())); } catch (e) {}
     }
     function clearDraft() { try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
     function setChecked(group, val) {
@@ -696,11 +701,7 @@
     }
     function restoreDraft() {
       let d; try { d = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch (e) { return; }
-      if (!d) return;
-      TEXT_FIELDS.forEach(n => { if (form[n] && typeof d[n] === 'string') form[n].value = d[n]; });
-      CHIP_GROUPS.forEach(g => (d[g] || []).forEach(v => setChecked(g, v)));
-      toggleOther('reception_vibe'); toggleOther('dancefloor_styles');
-      updateEventType();
+      applyDraftObject(d);
     }
 
     // ---------- בר התקדמות ----------
@@ -1133,9 +1134,16 @@
       }
     }
 
+    // ---------- קידוד נתונים ללינק דיג'יי (UTF-8 בטוח, URL-safe) ----------
+    function b64encode(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+    function b64decode(str) { str = str.replace(/-/g, '+').replace(/_/g, '/'); return decodeURIComponent(escape(atob(str))); }
+    function buildDjLink() {
+      try { return location.origin + location.pathname + '#dj=' + b64encode(JSON.stringify(getDraftObject())); }
+      catch (e) { return ''; }
+    }
+
     // ---------- מעברי מסך של דף הקרב ----------
-    function openBattleSheet() {
-      const d = currentData || collectData();
+    function showBattle(d) {
       currentData = d;
       document.getElementById('battleContent').innerHTML = renderBattleSheet(d);
       document.getElementById('successView').classList.add('hidden');
@@ -1143,15 +1151,25 @@
       document.getElementById('battleView').classList.remove('hidden');
       window.scrollTo(0, 0);
     }
-    document.getElementById('battleBtn').addEventListener('click', openBattleSheet);
+    // פתיחת דף הקרב אצל הדיג'יי מתוך לינק (#dj=...)
+    function loadFromDjLink() {
+      const m = (location.hash || '').match(/[#&]dj=([^&]+)/);
+      if (!m) return false;
+      try {
+        applyDraftObject(JSON.parse(b64decode(m[1])));
+        showBattle(collectData());
+        return true;
+      } catch (e) { return false; }
+    }
     document.getElementById('djPdfBtn').addEventListener('click', downloadDjPdf);
     document.getElementById('djWaBtn').addEventListener('click', () => {
       const d = currentData || collectData();
-      window.open(`https://wa.me/${DJ.phone}?text=${encodeURIComponent(buildDjWhatsapp(d))}`, '_blank');
+      window.open(`https://wa.me/?text=${encodeURIComponent(buildDjWhatsapp(d))}`, '_blank');
     });
     document.getElementById('backToEditBtn').addEventListener('click', () => {
       document.getElementById('battleView').classList.add('hidden');
       document.getElementById('formView').classList.remove('hidden');
+      document.querySelectorAll('#eventForm section').forEach(s => s.classList.add('in'));
       window.scrollTo(0, 0);
     });
 
@@ -1181,7 +1199,10 @@
       if (!validate()) return;
       const data = collectData();
       currentData = data;
-      document.getElementById('whatsappBtn').href = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(waMessage(data))}`;
+      const djLink = buildDjLink();
+      let msg = waMessage(data);
+      if (djLink) msg += `\n\n━━━━━━━━━━━━━━\n🎯 *דף קרב לדיג'יי* — כלי עבודה מלא (לפתיחה ע"י הדיג'יי):\n${djLink}`;
+      document.getElementById('whatsappBtn').href = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(msg)}`;
       document.getElementById('pdfNote').classList.toggle('hidden', !needsPdf);
       document.getElementById('formView').classList.add('hidden');
       document.getElementById('successView').classList.remove('hidden');
@@ -1217,7 +1238,8 @@
     // ---------- אתחול ----------
     (function init() {
       form.date.min = new Date().toISOString().split('T')[0];
-      restoreDraft();
+      // אם נכנסו דרך לינק "דף קרב" — פתח ישירות את הכלי לדיג'יי; אחרת טען טיוטה רגילה
+      if (!loadFromDjLink()) restoreDraft();
       updateProgress();
     })();
   </script>
