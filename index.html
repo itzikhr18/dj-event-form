@@ -1,34 +1,458 @@
-🎧
-איפיון אירוע
-מלאו את כל הפרטים בקפידה — בסיום תופק חוברת אירוע מסודרת שתישלח ישירות לדיג'יי.
-1
-פרטים טכניים
-שמות החוגגים
-תאריך האירוע
-מקום האירוע
-שעת קבלת פנים
-שעת חופה / תחילת האירוע
-2
-שירי מפתח
-הדביקו כאן קישור ישיר מ-יוטיוב או ספוטיפיי (הקישור חייב להתחיל ב-https).
-קישור לשיר כניסה לחופה
-קישור לשיר שבירת כוס
-קישור לשיר סלואו ראשון
-3
-עיצוב האווירה
-אווירה בקבלת הפנים
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>איפיון אירוע · ידידיה יונה</title>
+  <meta name="description" content="טופס איפיון אירוע — מלאו את כל הפרטים והפרטים יישלחו ישירות לדיג'יי ידידיה יונה" />
 
-סגנונות לרחבת הריקודים
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-4
-חוקי הברזל
-✅ שירים שחייבים להתנגן (Must Play)
-⛔ הרשימה השחורה (Do Not Play)
-סיום והפקת תיק אירוע 🎉
-כל הפרטים נשמרים אצלכם בלבד — שום מידע לא נשלח לשרת.
-✓
-תיק האירוע הופק בהצלחה!
-קובץ ה-PDF ירד אליכם למכשיר.
-עכשיו נותר רק לשלוח אותו לדיג'יי — לחצו על הכפתור, וצרפו את הקובץ שירד להודעה.
-שלחו את תיק האירוע לדיג'יי בוואטסאפ ↻ מילוי טופס חדש
+  <!-- גופן עברי -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
+  <!-- ייצור PDF בצד-לקוח (אופציונלי) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Heebo', 'sans-serif'] },
+          colors: {
+            ink: '#0b0b12',
+            panel: '#15151f',
+            panel2: '#1d1d2b',
+            gold: '#d4af6a',
+            goldsoft: '#e8d3a0',
+            line: '#2a2a3c',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-size: 16px; line-height: 1.7; word-spacing: 0.05em; }
+    /* רקע כהה עם זוהר עדין */
+    .bg-stage {
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(212,175,106,0.12), transparent 60%),
+        radial-gradient(900px 500px at 10% 110%, rgba(120,80,200,0.10), transparent 55%),
+        #0b0b12;
+    }
+    .ltr { direction: ltr; unicode-bidi: isolate; text-align: left; }
+    input[type="time"], input[type="date"], input[type="url"] { direction: ltr; text-align: start; }
+    /* checkbox מותאם */
+    .chip {
+      transition: all .15s ease;
+      user-select: none;
+    }
+    .chip input { display: none; }
+    .chip.checked {
+      background: linear-gradient(180deg, rgba(212,175,106,0.22), rgba(212,175,106,0.10));
+      border-color: #d4af6a;
+      color: #e8d3a0;
+    }
+    .field {
+      background: #1d1d2b;
+      border: 1px solid #2a2a3c;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .field:focus {
+      outline: none;
+      border-color: #d4af6a;
+      box-shadow: 0 0 0 3px rgba(212,175,106,0.15);
+    }
+    .step-badge {
+      background: linear-gradient(180deg, #d4af6a, #b9914f);
+      color: #0b0b12;
+    }
+    ::placeholder { color: #6b6b80; }
+    .hidden-real { position:absolute; left:-9999px; }
+    /* זוהר עדין סביב הלוגו */
+    .logo-glow { box-shadow: 0 0 0 1px rgba(212,175,106,0.35), 0 8px 40px rgba(212,175,106,0.25); }
+    /* גלילה חלקה */
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+
+<body class="bg-stage text-gray-100 min-h-screen">
+
+  <!-- ====== הטופס ====== -->
+  <main id="formView" class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+
+    <!-- כותרת + מיתוג הדיג'יי -->
+    <header class="text-center mb-10">
+      <img src="logo.png" alt="ידידיה יונה — דיג'יי" width="112" height="112"
+        class="logo-glow w-28 h-28 rounded-full mx-auto mb-4 object-cover" />
+      <div class="text-gold text-sm tracking-[0.3em] font-semibold mb-1">ידידיה יונה · DJ</div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">איפיון אירוע</h1>
+      <p class="text-gray-400 mt-2 max-w-xl mx-auto">
+        מלאו את כל הפרטים בקפידה — בסיום הכל יישלח ישירות לידידיה בלחיצה אחת.
+      </p>
+    </header>
+
+    <form id="eventForm" class="space-y-6">
+
+      <!-- ====== חלק 1 ====== -->
+      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">1</span>
+          <h2 class="text-xl font-bold">פרטים טכניים</h2>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">שמות החוגגים</label>
+            <input type="text" name="couple" required placeholder="לדוגמה: דנה ויוסי"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">תאריך האירוע</label>
+            <input type="date" name="date" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">מקום האירוע</label>
+            <input type="text" name="venue" required placeholder="שם האולם / גן האירועים"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שעת קבלת פנים</label>
+            <input type="time" name="reception" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שעת חופה / תחילת האירוע</label>
+            <input type="time" name="ceremony" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">טלפון איש קשר <span class="text-gray-500">(לחזרה אליכם)</span></label>
+            <input type="tel" name="contact_phone" inputmode="tel" placeholder="050-0000000"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== חלק 2 ====== -->
+      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">2</span>
+          <h2 class="text-xl font-bold">שירי מפתח</h2>
+        </div>
+        <p class="text-sm text-gray-400 mb-5">
+          הדביקו כאן קישור ישיר מ-<b>יוטיוב</b> או <b>ספוטיפיי</b> (הקישור חייב להתחיל ב-https).
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">קישור לשיר כניסה לחופה</label>
+            <input type="url" name="song_entrance" placeholder="https://..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">קישור לשיר שבירת כוס</label>
+            <input type="url" name="song_glass" placeholder="https://..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">קישור לשיר סלואו ראשון</label>
+            <input type="url" name="song_slow" placeholder="https://..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== חלק 3 ====== -->
+      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">3</span>
+          <h2 class="text-xl font-bold">עיצוב האווירה</h2>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-goldsoft mb-3">אווירה בקבלת הפנים</label>
+          <div id="reception_vibe" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-goldsoft mb-3">סגנונות לרחבת הריקודים</label>
+          <div id="dancefloor_styles" class="flex flex-wrap gap-2"></div>
+        </div>
+      </section>
+
+      <!-- ====== חלק 4 ====== -->
+      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">4</span>
+          <h2 class="text-xl font-bold">חוקי הברזל</h2>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">
+              ✅ שירים שחייבים להתנגן <span class="text-gray-500">(Must Play)</span>
+            </label>
+            <textarea name="must_play" rows="5" placeholder="כתבו שמות שירים או הדביקו קישורים מיוטיוב, כל שיר בשורה נפרדת..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">
+              ⛔ הרשימה השחורה <span class="text-gray-500">(Do Not Play)</span>
+            </label>
+            <textarea name="do_not_play" rows="5" placeholder="שירים, אמנים או סגנונות שאסור להשמיע..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- כפתור -->
+      <button type="submit"
+        class="w-full step-badge font-bold text-lg rounded-2xl py-4 hover:brightness-110 active:scale-[.99] transition">
+        סיום ושליחה לידידיה 🎉
+      </button>
+      <p class="text-center text-xs text-gray-500 pb-4">הפרטים נשלחים אליכם בלבד לידידיה — אין שמירה בשרת.</p>
+    </form>
+  </main>
+
+  <!-- ====== מסך הצלחה ====== -->
+  <section id="successView" class="hidden max-w-xl mx-auto px-4 py-16 text-center">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full step-badge text-4xl mb-6">✓</div>
+    <h2 class="text-3xl font-extrabold mb-3">כמעט סיימתם!</h2>
+    <p class="text-gray-400 mb-8">נשאר רק לשלוח את הפרטים לידידיה — לחצו על הכפתור, וההודעה תיפתח מוכנה לשליחה עם כל הפרטים. רק ללחוץ "שלח". 👇</p>
+
+    <a id="whatsappBtn" href="#" target="_blank" rel="noopener"
+      class="inline-flex items-center justify-center gap-3 w-full bg-[#25D366] text-[#0b1f12] font-bold text-lg rounded-2xl py-4 hover:brightness-105 active:scale-[.99] transition">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.52 0-3.01-.41-4.3-1.18l-.31-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.35c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.23 8.23z"/></svg>
+      שלחו את פרטי האירוע לידידיה בוואטסאפ
+    </a>
+
+    <div class="mt-6 flex flex-col items-center gap-3">
+      <button id="pdfBtn" type="button"
+        class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
+        ⬇️ הורדת עותק PDF מעוצב (אופציונלי)
+      </button>
+      <button onclick="location.reload()" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
+    </div>
+  </section>
+
+  <!-- ====== תבנית ה-PDF (מוסתרת) ====== -->
+  <div id="pdfTemplate" class="hidden-real"></div>
+
+  <script>
+    // ---------- פרטי הדיג'יי ----------
+    const DJ = {
+      name: 'ידידיה יונה',
+      phone: '972535918939', // 053-591-8939 בפורמט בינלאומי לוואטסאפ
+    };
+
+    // ---------- אפשרויות הצ'ק-בוקסים ----------
+    const RECEPTION = ['צ\'יל אאוט', 'ג\'אז', 'דיפ האוס', 'רוק רך', 'ישראלי שקט', 'אחר'];
+    const DANCEFLOOR = ['מיינסטרים', 'פופ', 'היפ הופ', 'טכנו/האוס', 'רגאטון', 'מזרחית/ים תיכוני', 'שנות ה-90', 'טראנס', 'רוק', 'אחר'];
+
+    function buildChips(containerId, options, groupName) {
+      const wrap = document.getElementById(containerId);
+      options.forEach((opt, i) => {
+        const id = groupName + '_' + i;
+        const label = document.createElement('label');
+        label.className = 'chip cursor-pointer rounded-full border border-line bg-panel2 px-4 py-2 text-sm text-gray-300';
+        label.innerHTML = `<input type="checkbox" name="${groupName}" value="${opt}" id="${id}"><span>${opt}</span>`;
+        const input = label.querySelector('input');
+        input.addEventListener('change', () => label.classList.toggle('checked', input.checked));
+        wrap.appendChild(label);
+      });
+    }
+    buildChips('reception_vibe', RECEPTION, 'reception_vibe');
+    buildChips('dancefloor_styles', DANCEFLOOR, 'dancefloor_styles');
+
+    // ---------- עזרי עיבוד ----------
+    const esc = (s) => (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const fmtDate = (d) => d ? d.split('-').reverse().join('/') : 'לא צוין';
+
+    function linkify(text) {
+      return esc(text)
+        .split('\n')
+        .map(line => {
+          const t = line.trim();
+          if (!t) return '';
+          const urlMatch = t.match(/^(https?:\/\/\S+)$/);
+          if (urlMatch) {
+            return `<div><a href="${urlMatch[1]}" style="color:#1a73e8;word-break:break-all;">${urlMatch[1]}</a></div>`;
+          }
+          const withLinks = t.replace(/(https?:\/\/\S+)/g, '<a href="$1" style="color:#1a73e8;word-break:break-all;">$1</a>');
+          return `<div>${withLinks}</div>`;
+        })
+        .join('');
+    }
+
+    function linkRow(label, url) {
+      if (!url) return `<tr><td style="padding:6px 0;color:#666;width:42%;">${label}</td><td style="padding:6px 0;color:#aaa;">לא צוין</td></tr>`;
+      return `<tr><td style="padding:6px 0;color:#666;width:42%;">${label}</td><td style="padding:6px 0;"><a href="${esc(url)}" style="color:#1a73e8;word-break:break-all;">${esc(url)}</a></td></tr>`;
+    }
+
+    function getChecked(name) {
+      return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
+    }
+
+    // ---------- בניית הודעת הוואטסאפ (כל הפרטים + קישורים לחיצים) ----------
+    function buildWhatsappText(d) {
+      const recVibe = d.reception_vibe.length ? d.reception_vibe.join(' · ') : 'לא צוין';
+      const dance = d.dancefloor_styles.length ? d.dancefloor_styles.join(' · ') : 'לא צוין';
+      const line = (label, val) => `${label}: ${val || '—'}`;
+      const block = (text) => (text ? text : '—');
+
+      const parts = [
+        `🎧 *תיק אירוע · ${DJ.name}*`,
+        `━━━━━━━━━━━━━━`,
+        `👰🤵 *${d.couple || ''}*`,
+        line('📅 תאריך', fmtDate(d.date)),
+        line('📍 מקום', d.venue),
+        line('🕐 קבלת פנים', d.reception),
+        line('💍 חופה', d.ceremony),
+        d.contact_phone ? line('📞 איש קשר', d.contact_phone) : null,
+        ``,
+        `🎵 *שירי מפתח*`,
+        line('• כניסה לחופה', d.song_entrance),
+        line('• שבירת כוס', d.song_glass),
+        line('• סלואו ראשון', d.song_slow),
+        ``,
+        `🎨 *אווירה*`,
+        line('• קבלת פנים', recVibe),
+        line('• רחבת ריקודים', dance),
+        ``,
+        `✅ *חייבים להתנגן (Must Play)*`,
+        block(d.must_play),
+        ``,
+        `⛔ *אסור להשמיע (Do Not Play)*`,
+        block(d.do_not_play),
+      ].filter(x => x !== null);
+
+      return parts.join('\n');
+    }
+
+    // ---------- בניית תוכן ה-PDF ----------
+    function buildPdfHtml(d) {
+      const recVibe = d.reception_vibe.length ? d.reception_vibe.join(' · ') : 'לא צוין';
+      const dance = d.dancefloor_styles.length ? d.dancefloor_styles.join(' · ') : 'לא צוין';
+
+      return `
+      <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;width:760px;padding:40px;color:#1a1a1a;background:#fff;">
+        <div style="text-align:center;border-bottom:3px solid #d4af6a;padding-bottom:18px;margin-bottom:26px;">
+          <img src="logo.png" width="84" height="84" style="border-radius:50%;display:block;margin:0 auto 10px;" />
+          <div style="font-size:13px;letter-spacing:3px;color:#b9914f;font-weight:700;">${esc(DJ.name)} · DJ</div>
+          <div style="font-size:30px;font-weight:800;margin-top:4px;">🎧 תיק אירוע</div>
+          <div style="font-size:20px;color:#444;margin-top:6px;">${esc(d.couple) || ''}</div>
+        </div>
+
+        <h3 style="font-size:17px;color:#b9914f;border-right:4px solid #d4af6a;padding-right:10px;margin:20px 0 8px;">פרטים טכניים</h3>
+        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+          <tr><td style="padding:6px 0;color:#666;width:42%;">תאריך האירוע</td><td style="padding:6px 0;">${fmtDate(d.date)}</td></tr>
+          <tr><td style="padding:6px 0;color:#666;">מקום האירוע</td><td style="padding:6px 0;">${esc(d.venue) || 'לא צוין'}</td></tr>
+          <tr><td style="padding:6px 0;color:#666;">שעת קבלת פנים</td><td style="padding:6px 0;">${esc(d.reception) || 'לא צוין'}</td></tr>
+          <tr><td style="padding:6px 0;color:#666;">שעת חופה / תחילת האירוע</td><td style="padding:6px 0;">${esc(d.ceremony) || 'לא צוין'}</td></tr>
+          ${d.contact_phone ? `<tr><td style="padding:6px 0;color:#666;">טלפון איש קשר</td><td style="padding:6px 0;" dir="ltr">${esc(d.contact_phone)}</td></tr>` : ''}
+        </table>
+
+        <h3 style="font-size:17px;color:#b9914f;border-right:4px solid #d4af6a;padding-right:10px;margin:24px 0 8px;">שירי מפתח</h3>
+        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+          ${linkRow('שיר כניסה לחופה', d.song_entrance)}
+          ${linkRow('שיר שבירת כוס', d.song_glass)}
+          ${linkRow('שיר סלואו ראשון', d.song_slow)}
+        </table>
+
+        <h3 style="font-size:17px;color:#b9914f;border-right:4px solid #d4af6a;padding-right:10px;margin:24px 0 8px;">עיצוב האווירה</h3>
+        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+          <tr><td style="padding:6px 0;color:#666;width:42%;">אווירה בקבלת הפנים</td><td style="padding:6px 0;">${esc(recVibe)}</td></tr>
+          <tr><td style="padding:6px 0;color:#666;">סגנונות לרחבת הריקודים</td><td style="padding:6px 0;">${esc(dance)}</td></tr>
+        </table>
+
+        <h3 style="font-size:17px;color:#1a8a4a;border-right:4px solid #25D366;padding-right:10px;margin:24px 0 8px;">✅ חייבים להתנגן (Must Play)</h3>
+        <div style="font-size:14px;line-height:1.9;">${d.must_play ? linkify(d.must_play) : '<span style="color:#999;">לא צוין</span>'}</div>
+
+        <h3 style="font-size:17px;color:#c0392b;border-right:4px solid #e74c3c;padding-right:10px;margin:24px 0 8px;">⛔ הרשימה השחורה (Do Not Play)</h3>
+        <div style="font-size:14px;line-height:1.9;">${d.do_not_play ? linkify(d.do_not_play) : '<span style="color:#999;">לא צוין</span>'}</div>
+
+        <div style="margin-top:34px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:14px;">
+          הופק עבור ${esc(DJ.name)} · ${new Date().toLocaleDateString('he-IL')}
+        </div>
+      </div>`;
+    }
+
+    // ---------- מצב נוכחי (נשמר לאחר שליחה לצורך הורדת PDF) ----------
+    let currentData = null;
+
+    // ---------- הורדת PDF לפי דרישה ----------
+    async function downloadPdf() {
+      if (!currentData) return;
+      const btn = document.getElementById('pdfBtn');
+      const orig = btn.textContent;
+      btn.textContent = 'מפיק PDF... ⏳';
+      btn.disabled = true;
+
+      const tpl = document.getElementById('pdfTemplate');
+      tpl.innerHTML = buildPdfHtml(currentData);
+      const node = tpl.firstElementChild;
+
+      const safeName = (currentData.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
+      const fileName = `תיק-אירוע-${safeName}.pdf`;
+
+      try {
+        await html2pdf().set({
+          margin: 0,
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+          enableLinks: true,
+        }).from(node).save();
+      } catch (err) {
+        alert('הייתה בעיה בהפקת הקובץ. נסו שוב.');
+      } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
+      }
+    }
+    document.getElementById('pdfBtn').addEventListener('click', downloadPdf);
+
+    // ---------- שליחה ----------
+    document.getElementById('eventForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const f = e.target;
+
+      const data = {
+        couple: f.couple.value.trim(),
+        date: f.date.value,
+        venue: f.venue.value.trim(),
+        reception: f.reception.value,
+        ceremony: f.ceremony.value,
+        contact_phone: f.contact_phone.value.trim(),
+        song_entrance: f.song_entrance.value.trim(),
+        song_glass: f.song_glass.value.trim(),
+        song_slow: f.song_slow.value.trim(),
+        reception_vibe: getChecked('reception_vibe'),
+        dancefloor_styles: getChecked('dancefloor_styles'),
+        must_play: f.must_play.value.trim(),
+        do_not_play: f.do_not_play.value.trim(),
+      };
+      currentData = data;
+
+      // בניית קישור וואטסאפ ישיר לדיג'יי עם כל הפרטים
+      const waText = buildWhatsappText(data);
+      const waLink = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(waText)}`;
+      document.getElementById('whatsappBtn').href = waLink;
+
+      // מעבר למסך הצלחה
+      document.getElementById('formView').classList.add('hidden');
+      document.getElementById('successView').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    });
+  </script>
+</body>
+</html>
