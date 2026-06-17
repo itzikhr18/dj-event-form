@@ -78,6 +78,8 @@
     .step-badge { background: linear-gradient(180deg, #d4af6a, #b9914f); color: #0b0b12; }
     ::placeholder { color: #6b6b80; }
     .hidden-real { position:absolute; left:-9999px; }
+    /* במה לרינדור ה-PDF: נמצאת ב-0,0 עם פריסה תקינה אך מוסתרת מאחורי רקע הדף */
+    .pdf-stage { position: fixed; top: 0; left: 0; z-index: -9999; background: #fff; }
     html { scroll-behavior: smooth; }
 
     /* הילת לוגו מתנשמת */
@@ -425,7 +427,7 @@
       const dance = d.dancefloor_styles.length ? d.dancefloor_styles.join(' · ') : 'לא צוין';
 
       return `
-      <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;width:760px;padding:40px;color:#1a1a1a;background:#fff;">
+      <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;box-sizing:border-box;width:760px;padding:40px;color:#1a1a1a;background:#fff;">
         <div style="text-align:center;border-bottom:3px solid #d4af6a;padding-bottom:18px;margin-bottom:26px;">
           <img src="logo.png" width="84" height="84" style="border-radius:50%;display:block;margin:0 auto 10px;" />
           <div style="font-size:13px;letter-spacing:3px;color:#b9914f;font-weight:700;">${esc(DJ.name)} · DJ</div>
@@ -553,6 +555,7 @@
 
       const tpl = document.getElementById('pdfTemplate');
       tpl.innerHTML = buildPdfHtml(d);
+      tpl.className = 'pdf-stage'; // פריסה תקינה לרינדור (במקום left:-9999px)
       const node = tpl.firstElementChild;
       const safeName = (d.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
 
@@ -561,7 +564,7 @@
           margin: 0,
           filename: `תיק-אירוע-${safeName}.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 800 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
           pagebreak: { mode: ['css', 'legacy'] },
           enableLinks: true,
@@ -569,6 +572,8 @@
       } catch (err) {
         alert('הייתה בעיה בהפקת הקובץ. נסו שוב.');
       } finally {
+        tpl.className = 'hidden-real';
+        tpl.innerHTML = '';
         btn.textContent = orig;
         btn.disabled = false;
       }
