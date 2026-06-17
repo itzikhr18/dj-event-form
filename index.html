@@ -382,12 +382,45 @@
 
     <p id="pdfNote" class="hidden text-xs text-goldsoft mt-4">📎 הרשימות שלכם ארוכות — מומלץ גם להוריד את ה-PDF ולצרף אותו להודעה.</p>
 
-    <div class="mt-6 flex flex-col items-center gap-3">
+    <div class="mt-5 flex flex-col items-center gap-3">
       <button id="pdfBtn" type="button"
         class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
-        ⬇️ הורדת דף אירוע (PDF) מעוצב
+        ⬇️ הורדת דף אירוע ללקוח (PDF)
       </button>
-      <button id="newFormBtn" type="button" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
+    </div>
+
+    <div class="mt-8 pt-6 border-t border-line text-center">
+      <div class="text-gold text-xs tracking-[0.25em] font-semibold mb-3">— אזור הדיג'יי —</div>
+      <button id="battleBtn" type="button"
+        class="inline-flex items-center justify-center gap-2 w-full bg-panel2 border border-gold/50 text-goldsoft font-bold text-lg rounded-2xl py-4 hover:bg-panel hover:border-gold transition">
+        🎯 צור דף קרב לדיג'יי
+      </button>
+      <p class="text-xs text-gray-500 mt-2">סיכום עבודה מקצועי לדיג'יי — לו"ז, אנשי קשר, שירים וחוסרים לבדיקה לפני האירוע.</p>
+    </div>
+
+    <button id="newFormBtn" type="button" class="mt-6 text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
+  </section>
+
+  <!-- ====== דף קרב לדיג'יי ====== -->
+  <section id="battleView" class="hidden max-w-4xl mx-auto px-4 py-8 sm:py-10">
+    <header class="text-center mb-6">
+      <div class="text-gold text-xs tracking-[0.3em] font-semibold mb-1">כלי עבודה פנימי לדיג'יי</div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold">🎯 דף קרב לדיג'יי — סיכום אירוע</h1>
+    </header>
+    <div id="battleContent" class="space-y-4"></div>
+    <div class="sticky bottom-4 mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <button id="djWaBtn" type="button"
+        class="inline-flex items-center justify-center gap-2 bg-[#25D366] text-[#0b1f12] font-bold rounded-xl py-3.5 hover:brightness-105 active:scale-[.99] transition shadow-lg shadow-black/40">
+        💬 שלח סיכום בוואטסאפ
+      </button>
+      <button id="djPdfBtn" type="button"
+        class="step-badge font-bold rounded-xl py-3.5 hover:brightness-110 active:scale-[.99] transition shadow-lg shadow-black/40">
+        ⬇️ הורד PDF לדיג'יי
+      </button>
+      <button id="backToEditBtn" type="button"
+        class="border border-line text-gray-300 rounded-xl py-3.5 hover:bg-panel hover:border-gold transition">
+        ✏️ חזור לעריכת הטופס
+      </button>
     </div>
   </section>
 
@@ -726,6 +759,401 @@
       }
     }
     document.getElementById('pdfBtn').addEventListener('click', downloadPdf);
+
+    // ====================================================================
+    // ====================  דף קרב לדיג'יי  ==============================
+    // ====================================================================
+
+    // שעת הגעה מומלצת = קבלת פנים פחות שעה וחצי
+    function arrivalTime(reception) {
+      if (!reception || !/^\d{1,2}:\d{2}$/.test(reception)) return '';
+      const [h, m] = reception.split(':').map(Number);
+      let total = h * 60 + m - 90;
+      if (total < 0) total += 1440;
+      return String(Math.floor(total / 60)).padStart(2, '0') + ':' + String(total % 60).padStart(2, '0');
+    }
+    function cityFromAddress(addr) {
+      if (!addr) return '';
+      const parts = addr.split(',').map(s => s.trim()).filter(Boolean);
+      return parts.length > 1 ? parts[parts.length - 1] : '';
+    }
+    function parseSongs(text) {
+      return (text || '').split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+        const urlM = line.match(/(https?:\/\/\S+)/);
+        const link = urlM ? urlM[0] : '';
+        const label = line.replace(/(https?:\/\/\S+)/, '').replace(/[-–•]\s*$/, '').trim();
+        return { label: label || line, link, raw: line };
+      });
+    }
+    function freedomLevel(v) {
+      if (!v) return '';
+      if (v.indexOf('חופש מלא') === 0) return 'גבוהה';
+      if (v.indexOf('איזון') === 0) return 'בינונית';
+      if (v.indexOf('שליטה') === 0) return 'נמוכה';
+      return '';
+    }
+    function detectGaps(d, wedding) {
+      const g = [];
+      if (!d.nav_link) g.push('קישור ניווט / Waze לאולם');
+      if (!d.contact2) g.push('איש קשר גיבוי ליום האירוע');
+      if (!d.guests) g.push('כמות אורחים משוערת');
+      if (!d.must_play) g.push('רשימת שירי חובה מהלקוח');
+      if (wedding && !d.song_chupah) g.push('שיר כניסה לחופה');
+      if (wedding && !d.song_slow) g.push('שיר סלואו ראשון');
+      g.push('לוודא מול האולם: חשמל בעמדה · חניה לדיג\'יי · גישה לפריקה · מגבלת רעש');
+      return g;
+    }
+    function computeReadiness(d) {
+      const checks = [
+        ['תאריך אירוע', !!d.date],
+        ['מקום האירוע', !!d.venue],
+        ['איש קשר', !!d.contact_phone],
+        ['לו"ז מרכזי', !!(d.reception && d.ceremony)],
+        ['שירי חובה', !!d.must_play],
+        ['רשימת שירים אסורים', !!(d.do_not_play || d.artists_avoid)],
+        ['מידע טכני / ציוד', d.equipment.length > 0],
+        ['קישור ניווט', !!d.nav_link],
+      ];
+      const done = checks.filter(c => c[1]).length;
+      return { pct: Math.round(done / checks.length * 100), missing: checks.filter(c => !c[1]).map(c => c[0]) };
+    }
+    function buildSummary(d, b) {
+      let s = `אירוע מסוג ${d.event_type || '—'}`;
+      if (d.guests) s += ` עם כ-${d.guests} אורחים`;
+      s += '. ';
+      if (d.audience.length) s += `הקהל: ${d.audience.join(', ')}. `;
+      const emphasis = d.dancefloor_styles.length ? d.dancefloor_styles.slice(0, 3).join(', ')
+        : (d.reception_vibe.length ? d.reception_vibe.join(', ') : 'בהתאם לקריאת הרחבה');
+      s += `הדגש המוזיקלי: ${emphasis}. `;
+      if (b.freedom) s += `רמת חופש לדיג'יי: ${b.freedom}. `;
+      if (b.mustSongs.length) s += `שירי חובה: ${b.mustSongs.slice(0, 3).map(x => x.label).join(', ')}. `;
+      const avoid = (d.do_not_play || d.artists_avoid || '').split('\n').filter(x => x.trim())[0];
+      if (avoid) s += `אסור לנגן: ${avoid}. `;
+      const realGaps = b.gaps.filter(g => g.indexOf('לוודא מול האולם') !== 0);
+      if (realGaps.length) s += `לפני האירוע חובה לסגור: ${realGaps.slice(0, 3).join(', ')}.`;
+      return s.trim();
+    }
+    function getBattle(d) {
+      const wedding = WEDDING_TYPES.includes(d.event_type);
+      const b = {
+        wedding,
+        arrival: arrivalTime(d.reception),
+        city: cityFromAddress(d.address),
+        freedom: freedomLevel(d.dj_freedom),
+        mustSongs: parseSongs(d.must_play),
+        gaps: detectGaps(d, wedding),
+        readiness: computeReadiness(d),
+      };
+      b.summary = buildSummary(d, b);
+      return b;
+    }
+
+    // ---------- רינדור דף הקרב (HTML) ----------
+    function renderBattleSheet(d) {
+      const b = getBattle(d);
+      const todo = '<span class="text-amber-300/90 text-sm">חסר — להשלים מול הלקוח</span>';
+      const check = '<span class="text-amber-300/90 text-sm">חסר — לבדיקה</span>';
+
+      const r = (label, val, miss) => {
+        const has = val && String(val).trim();
+        return `<div class="flex justify-between gap-3 py-1.5 border-b border-line/30 last:border-0">
+          <span class="text-gray-400 text-sm shrink-0">${label}</span>
+          <span class="text-gray-100 text-sm text-left">${has ? esc(val) : (miss === 'check' ? check : todo)}</span></div>`;
+      };
+      const rLink = (label, url) => `<div class="flex justify-between gap-3 py-1.5 border-b border-line/30 last:border-0">
+        <span class="text-gray-400 text-sm shrink-0">${label}</span>
+        <span class="text-sm text-left">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="text-sky-400 underline break-all">פתח</a>` : todo}</span></div>`;
+      const card = (icon, title, inner) => `<div class="bg-panel border border-line rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3"><span class="text-xl">${icon}</span><h3 class="font-bold text-lg text-goldsoft">${title}</h3></div>${inner}</div>`;
+
+      const pct = b.readiness.pct;
+      const color = pct >= 80 ? '#25D366' : pct >= 50 ? '#d4af6a' : '#e74c3c';
+
+      // לו"ז
+      const sched = [
+        r('קבלת פנים', d.reception),
+        r('כניסה / פתיחת אירוע', d.ceremony),
+      ];
+      if (b.wedding) {
+        sched.push(r('חופה', d.song_chupah ? 'שיר מוגדר · שעה לתיאום' : '', 'todo'));
+        sched.push(r('שבירת כוס', d.song_glass ? 'שיר מוגדר · שעה לתיאום' : '', 'todo'));
+        sched.push(r('סלואו ראשון', d.song_slow ? 'שיר מוגדר · שעה לתיאום' : '', 'todo'));
+      }
+      ['אוכל', 'נאומים', 'הפתעות', 'ריקודים', 'סיום אירוע'].forEach(x => sched.push(r(x, '', 'todo')));
+
+      // שירי חובה
+      const must = b.mustSongs.length
+        ? `<ul class="space-y-2">${b.mustSongs.map(s => `<li class="flex items-center justify-between gap-3 text-sm">
+            <span class="text-gray-100">🎵 ${esc(s.label)}</span>
+            ${s.link ? `<a href="${esc(s.link)}" target="_blank" rel="noopener" class="text-sky-400 underline shrink-0">קישור</a>` : ''}</li>`).join('')}</ul>`
+        : '<p class="text-amber-300/90 text-sm">הלקוח לא הגדיר שירי חובה</p>';
+
+      // רשימה שחורה
+      const forbidParts = [];
+      if (d.do_not_play) forbidParts.push(`<div><div class="text-gray-400 text-xs mb-1">שירים אסורים</div><div class="text-gray-100 text-sm whitespace-pre-line">${esc(d.do_not_play)}</div></div>`);
+      if (d.artists_avoid) forbidParts.push(`<div><div class="text-gray-400 text-xs mb-1">אמנים אסורים</div><div class="text-gray-100 text-sm whitespace-pre-line">${esc(d.artists_avoid)}</div></div>`);
+      const forbid = forbidParts.length ? `<div class="space-y-3">${forbidParts.join('')}</div>` : '<p class="text-gray-400 text-sm">לא הוגדרה רשימת שירים אסורים</p>';
+
+      // טכני
+      const eq = d.equipment;
+      const has = kw => eq.some(x => x.indexOf(kw) !== -1);
+      const amp = has('הגברה מלאה') ? "נדרשת הגברה מלאה מהדיג'יי" : has('הגברה קבועה') ? 'יש הגברה קבועה במקום' : '';
+      const tech = [
+        r('הגברה', amp, 'check'),
+        r('תאורה', has('תאורה') ? 'נדרשת תאורה לרחבה' : '', 'check'),
+        r('מיקרופון', has('מיקרופון') ? 'נדרש אלחוטי לנאומים' : '', 'check'),
+        r('אירוע בחוץ / משולב', has('בחוץ') ? 'כן' : '', 'check'),
+        r('חשמל קרוב לעמדה', '', 'check'),
+        r("חניה לדיג'יי", '', 'check'),
+        r('גישה נוחה לפריקה', '', 'check'),
+        r('מדרגות / מעלית / סחיבה', '', 'check'),
+        r('מגבלת רעש', '', 'check'),
+        r('דרישות מיוחדות מהאולם', d.notes || '', 'check'),
+      ];
+
+      const banner = (pct < 100)
+        ? `<div class="rounded-xl px-4 py-3 text-sm flex items-center gap-2" style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.4);color:#fca5a5">⚠️ יש פרטים חשובים שחסרים לפני האירוע — ראו "מה צריך לסגור".</div>`
+        : '';
+
+      return `
+      ${banner}
+
+      <div class="bg-panel border border-line rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-bold text-lg">📊 מוכנות אירוע</span>
+          <span class="text-3xl font-extrabold" style="color:${color}">${pct}%</span>
+        </div>
+        <div class="h-3 rounded-full bg-panel2 overflow-hidden"><div class="h-full rounded-full transition-all" style="width:${pct}%;background:${color}"></div></div>
+        ${b.readiness.missing.length
+          ? `<p class="text-sm text-gray-400 mt-3">כדי להגיע ל-100% צריך להשלים: <span class="text-amber-300/90">${b.readiness.missing.join(' · ')}</span></p>`
+          : '<p class="text-sm mt-3" style="color:#25D366">הכל מוכן ✅</p>'}
+      </div>
+
+      <div class="rounded-2xl p-5 border-2" style="border-color:rgba(231,76,60,0.6);background:rgba(231,76,60,0.08)">
+        <div class="flex items-center gap-2 mb-3"><span class="text-2xl">⚠️</span><h3 class="font-extrabold text-lg text-red-300">מה צריך לסגור לפני האירוע</h3></div>
+        <ul class="space-y-2">${b.gaps.map(g => `<li class="flex gap-2 text-sm text-gray-100"><span class="text-red-400 shrink-0">◆</span><span>${esc(g)}</span></li>`).join('')}</ul>
+      </div>
+
+      <div class="bg-panel border border-line rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-2"><span class="text-xl">🧠</span><h3 class="font-bold text-lg text-goldsoft">תקציר לדיג'יי</h3></div>
+        <p class="text-gray-200 leading-relaxed">${esc(b.summary)}</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        ${card('📋', 'פרטי אירוע מהירים', [
+          r('סוג אירוע', d.event_type),
+          r('שמות החוגגים', d.couple),
+          r('תאריך', fmtDate(d.date)),
+          r('אולם / מקום', d.venue),
+          r('עיר', b.city, 'todo'),
+          r('כתובת מלאה', d.address, 'todo'),
+          rLink('ניווט / Waze', d.nav_link),
+          r('כמות אורחים', d.guests, 'todo'),
+          r('שעת התחלה', d.reception),
+          r('שעת סיום משוערת', '', 'todo'),
+          `<div class="flex justify-between gap-3 py-1.5"><span class="text-gray-400 text-sm">🚗 הגעה מומלצת לדיג'יי</span><span class="text-sm text-left ${b.arrival ? 'text-goldsoft font-semibold' : ''}">${b.arrival ? esc(b.arrival) + ' <span class="text-gray-500 text-xs">(שעה וחצי לפני)</span>' : todo}</span></div>`,
+        ].join(''))}
+
+        ${card('📞', 'אנשי קשר', [
+          r('טלפון איש קשר ראשי', d.contact_phone),
+          r('איש קשר נוסף (גיבוי)', d.contact2, 'todo'),
+          r('איש קשר טכני / אולם', d.venue_contact, 'todo'),
+          `<div class="mt-3 rounded-lg px-3 py-2 text-sm" style="background:rgba(212,175,106,0.1);border:1px solid rgba(212,175,106,0.3);color:#e8d3a0">📌 במקרה של בעיה באירוע — קודם לפנות ל: <b>${esc(d.contact_phone || d.contact2 || 'לא צוין')}</b></div>`,
+        ].join(''))}
+
+        ${card('⏱️', 'לו"ז קריטי', sched.join(''))}
+
+        ${card('✅', 'מוזיקה חובה (Must Play)', must)}
+
+        ${card('⛔', 'מוזיקה אסורה (Do Not Play)', forbid)}
+
+        ${card('👥', 'אופי הקהל', [
+          r('טווח גילאים', d.age_range, 'todo'),
+          r('סגנון קהל', d.audience.length ? d.audience.join(' · ') : '', 'todo'),
+          r('סגנונות אהובים', d.dancefloor_styles.length ? d.dancefloor_styles.join(' · ') : '', 'todo'),
+          r('אווירת קבלת פנים', d.reception_vibe.length ? d.reception_vibe.join(' · ') : '', 'todo'),
+          r("רמת חופש לדיג'יי", b.freedom ? b.freedom + ' (' + d.dj_freedom + ')' : '', 'todo'),
+        ].join(''))}
+
+        ${card('🔊', 'ציוד וטכני', tech.join(''))}
+      </div>`;
+    }
+
+    // ---------- PDF פנימי לדיג'יי (קצר וחד) ----------
+    function buildDjPdfHtml(d) {
+      const b = getBattle(d);
+      const join = a => a.length ? a.join(' · ') : '';
+      const cell = (label, val, miss) => `<tr><td style="padding:3px 8px 3px 0;color:#777;width:42%;vertical-align:top;">${label}</td><td style="padding:3px 0;font-weight:600;${(!val && miss) ? 'color:#c0392b;' : ''}">${esc(val) || (miss ? 'חסר — להשלים' : 'לא צוין')}</td></tr>`;
+      const eq = d.equipment, has = kw => eq.some(x => x.indexOf(kw) !== -1);
+      const amp = has('הגברה מלאה') ? "הגברה מלאה מהדיג'יי" : has('הגברה קבועה') ? 'הגברה קבועה במקום' : '';
+      const pct = b.readiness.pct;
+      const color = pct >= 80 ? '#1a8a4a' : pct >= 50 ? '#b9914f' : '#c0392b';
+
+      const sched = [['קבלת פנים', d.reception], ['כניסה / פתיחה', d.ceremony]];
+      if (b.wedding) { sched.push(['חופה', '']); sched.push(['שבירת כוס', '']); sched.push(['סלואו', '']); }
+      [['אוכל', ''], ['נאומים', ''], ['ריקודים', ''], ['סיום', '']].forEach(x => sched.push(x));
+
+      const mustHtml = b.mustSongs.length
+        ? b.mustSongs.map(s => `<div>🎵 ${esc(s.label)}${s.link ? ` — <a href="${esc(s.link)}" style="color:#1a73e8;">קישור</a>` : ''}</div>`).join('')
+        : '<span style="color:#999;">הלקוח לא הגדיר שירי חובה</span>';
+      const forbidHtml = (d.do_not_play || d.artists_avoid)
+        ? `${d.do_not_play ? linkify(d.do_not_play) : ''}${d.artists_avoid ? '<div style="margin-top:4px;">אמנים: ' + esc(d.artists_avoid) + '</div>' : ''}`
+        : '<span style="color:#999;">לא הוגדרה רשימה</span>';
+
+      const H = t => `<h3 style="font-size:14px;color:#b9914f;border-right:3px solid #d4af6a;padding-right:8px;margin:14px 0 6px;">${t}</h3>`;
+
+      return `
+      <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;box-sizing:border-box;width:760px;padding:34px;color:#1a1a1a;background:#fff;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d4af6a;padding-bottom:12px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px;letter-spacing:2px;color:#b9914f;font-weight:700;">דף קרב לדיג'יי · ${esc(DJ.name)}</div>
+            <div style="font-size:22px;font-weight:800;">${esc(d.event_type) || 'אירוע'} — ${esc(d.couple) || ''}</div>
+            <div style="font-size:13px;color:#555;">${fmtDate(d.date)} · ${esc(d.venue) || ''}${b.city ? ' · ' + esc(b.city) : ''}</div>
+          </div>
+          <div style="text-align:center;border:2px solid ${color};border-radius:10px;padding:6px 12px;">
+            <div style="font-size:9px;color:#777;">מוכנות</div>
+            <div style="font-size:24px;font-weight:800;color:${color};">${pct}%</div>
+          </div>
+        </div>
+
+        <div style="border:2px solid #e74c3c;border-radius:8px;padding:8px 12px;margin-bottom:12px;background:#fff8f7;">
+          <div style="font-size:12px;font-weight:700;color:#c0392b;margin-bottom:4px;">⚠️ מה צריך לסגור לפני האירוע</div>
+          <div style="font-size:12px;line-height:1.7;">${b.gaps.map(g => '◆ ' + esc(g)).join('<br>')}</div>
+        </div>
+
+        <div style="display:flex;gap:18px;">
+          <div style="flex:1;">
+            ${H('פרטי אירוע')}
+            <table style="width:100%;border-collapse:collapse;">
+              ${cell('כתובת', d.address, true)}
+              ${cell('ניווט', d.nav_link, true)}
+              ${cell('אורחים', d.guests, true)}
+              ${cell('שעת התחלה', d.reception)}
+              ${cell("הגעה מומלצת", b.arrival)}
+            </table>
+            ${H('אנשי קשר')}
+            <table style="width:100%;border-collapse:collapse;">
+              ${cell('ראשי', d.contact_phone)}
+              ${cell('גיבוי', d.contact2, true)}
+              ${cell('אולם', d.venue_contact, true)}
+            </table>
+          </div>
+          <div style="flex:1;">
+            ${H('לו"ז קריטי')}
+            <table style="width:100%;border-collapse:collapse;">
+              ${sched.map(s => cell(s[0], s[1], true)).join('')}
+            </table>
+          </div>
+        </div>
+
+        ${H('✅ מוזיקה חובה')}
+        <div style="font-size:13px;line-height:1.8;">${mustHtml}</div>
+        ${H('⛔ מוזיקה אסורה')}
+        <div style="font-size:13px;line-height:1.8;">${forbidHtml}</div>
+
+        <div style="page-break-before:always;height:8px;"></div>
+        ${H('אופי הקהל')}
+        <table style="width:100%;border-collapse:collapse;">
+          ${cell('טווח גילאים', d.age_range, true)}
+          ${cell('סגנון קהל', join(d.audience), true)}
+          ${cell('סגנונות אהובים', join(d.dancefloor_styles), true)}
+          ${cell('אווירת קבלת פנים', join(d.reception_vibe), true)}
+          ${cell("רמת חופש לדיג'יי", b.freedom ? b.freedom + ' (' + d.dj_freedom + ')' : '', true)}
+        </table>
+        ${H('ציוד וטכני')}
+        <table style="width:100%;border-collapse:collapse;">
+          ${cell('הגברה', amp, true)}
+          ${cell('תאורה', has('תאורה') ? 'נדרשת' : '', true)}
+          ${cell('מיקרופון', has('מיקרופון') ? 'אלחוטי לנאומים' : '', true)}
+          ${cell('חשמל בעמדה', '', true)}
+          ${cell("חניה לדיג'יי", '', true)}
+          ${cell('גישה לפריקה', '', true)}
+          ${cell('מגבלת רעש', '', true)}
+        </table>
+        ${d.notes ? H('דגשים מיוחדים') + `<div style="font-size:13px;line-height:1.8;">${linkify(d.notes)}</div>` : ''}
+
+        ${H('תקציר')}
+        <div style="font-size:13px;line-height:1.8;background:#faf6ec;border-radius:6px;padding:8px 12px;">${esc(b.summary)}</div>
+
+        <div style="margin-top:16px;text-align:center;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;">
+          דף קרב פנימי · ${esc(DJ.name)} · ${new Date().toLocaleDateString('he-IL')}
+        </div>
+      </div>`;
+    }
+
+    // ---------- וואטסאפ קצר לדיג'יי ----------
+    function buildDjWhatsapp(d) {
+      const b = getBattle(d);
+      const short = t => { const f = (t || '').split('\n').filter(x => x.trim()); return f.length ? f.slice(0, 3).join(', ') : ''; };
+      const realGaps = b.gaps.filter(g => g.indexOf('לוודא מול האולם') !== 0);
+      const lines = [
+        `🎯 *דף קרב — ${d.event_type || 'אירוע'}*`,
+        d.couple ? `🎉 ${d.couple}` : null,
+        `📅 ${fmtDate(d.date)}`,
+        `📍 ${d.venue || '—'}${b.city ? ' · ' + b.city : ''}`,
+        d.nav_link ? `🧭 ${d.nav_link}` : null,
+        b.arrival ? `🚗 הגעה מומלצת: ${b.arrival}` : null,
+        `📞 ${d.contact_phone || '—'}`,
+        `⏱️ קבלת פנים ${d.reception || '—'} · רגע מרכזי ${d.ceremony || '—'}`,
+        `✅ חובה: ${short(d.must_play) || 'לא הוגדר'}`,
+        `⛔ אסור: ${short(d.do_not_play) || short(d.artists_avoid) || 'לא הוגדר'}`,
+        d.audience.length ? `👥 קהל: ${d.audience.join(', ')}` : null,
+        `📊 מוכנות: ${b.readiness.pct}%`,
+        `⚠️ לסגור: ${(realGaps.length ? realGaps : ['לוודא חשמל/חניה/פריקה מול האולם']).slice(0, 4).join(' · ')}`,
+      ];
+      return lines.filter(Boolean).join('\n');
+    }
+
+    // ---------- הורדת PDF לדיג'יי ----------
+    async function downloadDjPdf() {
+      const d = currentData || collectData();
+      const btn = document.getElementById('djPdfBtn');
+      const orig = btn.textContent;
+      btn.textContent = 'מפיק PDF... ⏳'; btn.disabled = true;
+      const tpl = document.getElementById('pdfTemplate');
+      tpl.innerHTML = buildDjPdfHtml(d);
+      tpl.className = 'pdf-stage';
+      const node = tpl.firstElementChild;
+      const safeName = (d.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
+      try {
+        await html2pdf().set({
+          margin: [14, 0, 14, 0],
+          filename: `דף-קרב-${safeName}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'] },
+          enableLinks: true,
+        }).from(node).save();
+      } catch (err) {
+        alert('הייתה בעיה בהפקת הקובץ. נסו שוב.');
+      } finally {
+        tpl.className = 'hidden-real'; tpl.innerHTML = '';
+        btn.textContent = orig; btn.disabled = false;
+      }
+    }
+
+    // ---------- מעברי מסך של דף הקרב ----------
+    function openBattleSheet() {
+      const d = currentData || collectData();
+      currentData = d;
+      document.getElementById('battleContent').innerHTML = renderBattleSheet(d);
+      document.getElementById('successView').classList.add('hidden');
+      document.getElementById('formView').classList.add('hidden');
+      document.getElementById('battleView').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+    document.getElementById('battleBtn').addEventListener('click', openBattleSheet);
+    document.getElementById('djPdfBtn').addEventListener('click', downloadDjPdf);
+    document.getElementById('djWaBtn').addEventListener('click', () => {
+      const d = currentData || collectData();
+      window.open(`https://wa.me/${DJ.phone}?text=${encodeURIComponent(buildDjWhatsapp(d))}`, '_blank');
+    });
+    document.getElementById('backToEditBtn').addEventListener('click', () => {
+      document.getElementById('battleView').classList.add('hidden');
+      document.getElementById('formView').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    });
 
     // ---------- ולידציה ----------
     function flashError(el) {
