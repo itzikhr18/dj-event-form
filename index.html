@@ -549,12 +549,6 @@
       }
       p.push('🔎 לוודא מול האולם: ' + VERIFY_REMINDER, '');
 
-      // הוספה ליומן בלחיצה אחת (תזכורות אוטומטיות מטופלות בקובץ ה-.ics / היומן)
-      const gcal = googleCalUrl(d);
-      if (gcal) {
-        p.push('━━━━━━━━', '📅 *הוספה ליומן* (תזכורת 3 ימים לפני + ביום האירוע)', gcal, '');
-      }
-
       // 1 · תקציר אירוע
       p.push('━━━━━━━━', '📋 *תקציר אירוע*');
       p.push(L('📅 תאריך', fmtDate(d.date)));
@@ -596,6 +590,12 @@
       p.push('מיקרופון: ' + (has('מיקרופון') ? 'אלחוטי לנאומים' : 'חסר לבדיקה'));
       p.push('חשמל / חניה / פריקה / רעש: חסר לבדיקה');
       if (d.notes) p.push('📝 הערות: ' + d.notes);
+
+      // הוספה ליומן בלחיצה אחת — בסוף ההודעה כדי לא להפריע לקריאה (קישור מקוצר)
+      const gcal = googleCalUrl(d);
+      if (gcal) {
+        p.push('', '━━━━━━━━', '📅 *הוספה ליומן* (תזכורת 3 ימים לפני + ביום האירוע):', gcal);
+      }
 
       return p.filter(x => x !== null && x !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
     }
@@ -755,7 +755,9 @@
       return [d.venue, d.address].filter(Boolean).join(', ');
     }
 
-    // קישור "הוספה ליומן" של Google — לחיצה אחת מוסיפה את האירוע ליומן של הדיג'יי
+    // קישור "הוספה ליומן" של Google — לחיצה אחת מוסיפה את האירוע ליומן של הדיג'יי.
+    // מקוצר בכוונה (כותרת + תאריך/שעה בלבד) כדי שלא יצא ארוך בהודעת הוואטסאפ —
+    // כל שאר הפרטים ממילא מופיעים בגוף ההודעה, ובקובץ ה-.ics יש את המידע המלא.
     function googleCalUrl(d) {
       const start = eventStartDate(d);
       if (!start) return '';
@@ -764,8 +766,6 @@
         action: 'TEMPLATE',
         text: calTitle(d),
         dates: fmtCalLocal(start) + '/' + fmtCalLocal(end),
-        details: calDetails(d),
-        location: calLocation(d),
       });
       return 'https://calendar.google.com/calendar/render?' + params.toString();
     }
