@@ -375,7 +375,13 @@
 
     <p id="pdfNote" class="hidden text-xs text-goldsoft mt-4">📎 הרשימות שלכם ארוכות — מומלץ גם להוריד את ה-PDF ולצרף אותו להודעה.</p>
 
+    <p id="calNote" class="text-xs text-goldsoft mt-4">📅 רוצים שלא לשכוח? הוסיפו את האירוע ליומן עם תזכורות אוטומטיות — 3 ימים לפני ובבוקר יום האירוע.</p>
+
     <div class="mt-6 flex flex-col items-center gap-3">
+      <button id="calBtn" type="button"
+        class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
+        📅 הוספת האירוע ליומן עם תזכורות
+      </button>
       <button id="pdfBtn" type="button"
         class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
         ⬇️ הורדת דף האירוע (PDF) מסודר
@@ -543,6 +549,12 @@
       }
       p.push('🔎 לוודא מול האולם: ' + VERIFY_REMINDER, '');
 
+      // הוספה ליומן בלחיצה אחת (תזכורות אוטומטיות מטופלות בקובץ ה-.ics / היומן)
+      const gcal = googleCalUrl(d);
+      if (gcal) {
+        p.push('━━━━━━━━', '📅 *הוספה ליומן* (תזכורת 3 ימים לפני + ביום האירוע)', gcal, '');
+      }
+
       // 1 · תקציר אירוע
       p.push('━━━━━━━━', '📋 *תקציר אירוע*');
       p.push(L('📅 תאריך', fmtDate(d.date)));
@@ -705,6 +717,106 @@
       </div>`;
     }
 
+    // ---------- תזכורות יומן (Google Calendar + קובץ .ics) ----------
+    const EVENT_DURATION_HOURS = 5;      // משך משוער לאירוע (לקביעת שעת סיום ביומן)
+    const REMINDER_DAYS_BEFORE = 3;      // תזכורת מקדימה — כמה ימים לפני
+    const DEFAULT_START_HOUR = 19;       // שעת התחלה כברירת מחדל אם לא מולאה שעת קבלת פנים
+
+    const pad2 = (n) => String(n).padStart(2, '0');
+
+    // בניית מועד התחלת האירוע מתוך התאריך + שעת קבלת הפנים
+    function eventStartDate(d) {
+      if (!d.date) return null;
+      const [y, m, day] = d.date.split('-').map(Number);
+      let hh = DEFAULT_START_HOUR, mm = 0;
+      if (d.reception && /^\d{1,2}:\d{2}$/.test(d.reception)) {
+        [hh, mm] = d.reception.split(':').map(Number);
+      }
+      return new Date(y, m - 1, day, hh, mm, 0);
+    }
+    // פורמט מקומי לאירוע יומן: YYYYMMDDTHHMMSS (זמן "צף" — נשמר בשעון של היומן)
+    function fmtCalLocal(dt) {
+      return dt.getFullYear() + pad2(dt.getMonth() + 1) + pad2(dt.getDate()) +
+        'T' + pad2(dt.getHours()) + pad2(dt.getMinutes()) + '00';
+    }
+    function calTitle(d) {
+      return (`🎧 אירוע ${d.event_type || ''}` + (d.couple ? ' — ' + d.couple : '')).trim();
+    }
+    function calDetails(d) {
+      const lines = [];
+      if (d.couple) lines.push('לקוח: ' + d.couple);
+      if (d.reception) lines.push('קבלת פנים: ' + d.reception);
+      if (d.ceremony) lines.push('רגע מרכזי: ' + d.ceremony);
+      if (d.contact_phone) lines.push('איש קשר: ' + d.contact_phone);
+      if (d.nav_link) lines.push('ניווט: ' + d.nav_link);
+      return lines.join('\n');
+    }
+    function calLocation(d) {
+      return [d.venue, d.address].filter(Boolean).join(', ');
+    }
+
+    // קישור "הוספה ליומן" של Google — לחיצה אחת מוסיפה את האירוע ליומן של הדיג'יי
+    function googleCalUrl(d) {
+      const start = eventStartDate(d);
+      if (!start) return '';
+      const end = new Date(start.getTime() + EVENT_DURATION_HOURS * 3600 * 1000);
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: calTitle(d),
+        dates: fmtCalLocal(start) + '/' + fmtCalLocal(end),
+        details: calDetails(d),
+        location: calLocation(d),
+      });
+      return 'https://calendar.google.com/calendar/render?' + params.toString();
+    }
+
+    // קובץ .ics עם שתי תזכורות מובנות (3 ימים לפני + 09:00 בבוקר יום האירוע)
+    function buildIcs(d) {
+      const start = eventStartDate(d);
+      if (!start) return '';
+      const end = new Date(start.getTime() + EVENT_DURATION_HOURS * 3600 * 1000);
+      const morning = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 9, 0, 0);
+      // תזכורת הבוקר כהיסט יחסי לפני ההתחלה (תקני לכל יומן, ללא תלות באזור זמן)
+      const morningMin = Math.round((start - morning) / 60000);
+      const morningTrigger = morningMin > 0 ? `-PT${morningMin}M` : 'PT0M';
+      const ce = (s) => (s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+      const title = calTitle(d);
+      const lines = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Yedidya Yona DJ//Event Reminder//HE',
+        'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        'UID:dj-' + start.getTime() + '@yedidya-yona',
+        'DTSTAMP:' + fmtCalLocal(new Date()),
+        'DTSTART:' + fmtCalLocal(start),
+        'DTEND:' + fmtCalLocal(end),
+        'SUMMARY:' + ce(title),
+        'DESCRIPTION:' + ce(calDetails(d)),
+        'LOCATION:' + ce(calLocation(d)),
+        'BEGIN:VALARM', 'ACTION:DISPLAY',
+        'DESCRIPTION:' + ce(`בעוד ${REMINDER_DAYS_BEFORE} ימים — ${title}`),
+        `TRIGGER:-P${REMINDER_DAYS_BEFORE}D`, 'END:VALARM',
+        'BEGIN:VALARM', 'ACTION:DISPLAY',
+        'DESCRIPTION:' + ce('היום האירוע! — ' + title),
+        'TRIGGER:' + morningTrigger, 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR',
+      ];
+      return lines.join('\r\n');
+    }
+
+    function downloadIcs() {
+      const d = currentData || collectData();
+      const ics = buildIcs(d);
+      if (!ics) { alert('צריך למלא לפחות תאריך אירוע כדי ליצור תזכורת ביומן.'); return; }
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const safeName = (d.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
+      a.href = url;
+      a.download = `תזכורת-אירוע-${safeName}.ics`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     // ---------- שמירת טיוטה ----------
     function getDraftObject() {
       const d = {};
@@ -789,6 +901,7 @@
       }
     }
     document.getElementById('pdfBtn').addEventListener('click', downloadPdf);
+    document.getElementById('calBtn').addEventListener('click', downloadIcs);
 
     // ---------- ולידציה ----------
     function flashError(el) {
