@@ -506,7 +506,9 @@
       return lines.join('\n');
     }
     // יוצר קישור מוכן שפותח אצל ידידיה אירוע חדש ביומן גוגל בלחיצה אחת.
-    function googleCalUrl(d) {
+    // short=true ⇐ גרסה מקוצרת (כותרת + תאריך/שעה + מיקום בלבד, בלי התיאור הארוך),
+    // לשימוש כטקסט גלוי בהודעת הוואטסאפ כדי שהקישור יישאר קצר ככל האפשר.
+    function googleCalUrl(d, short) {
       const start = eventStartDate(d);
       if (!start) return '';
       const end = eventEndDate(d, start);
@@ -514,9 +516,10 @@
         action: 'TEMPLATE',
         text: calTitle(d),
         dates: fmtCalLocal(start) + '/' + fmtCalLocal(end),
-        location: calLocation(d),
-        details: calDescription(d),
       });
+      const loc = calLocation(d);
+      if (loc) params.set('location', loc);
+      if (!short) params.set('details', calDescription(d));
       return 'https://calendar.google.com/calendar/render?' + params.toString();
     }
 
@@ -536,7 +539,7 @@
         line('🎵', join(d.music_style)),
       ];
 
-      const gcal = googleCalUrl(d);
+      const gcal = googleCalUrl(d, true); // גרסה מקוצרת לקישור הגלוי בהודעה
       if (gcal) p.push('', '📅 הוסף את האירוע ליומן גוגל:', gcal);
 
       p.push('', '📎 את הסיכום המלא (PDF) אפשר לצרף כאן להודעה.');
