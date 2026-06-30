@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>איפיון אירוע · ידידיה יונה</title>
-  <meta name="description" content="טופס איפיון אירוע — מלאו את כל הפרטים והם יישלחו ישירות לדיג'יי ידידיה יונה" />
+  <title>טופס אירוע · ידידיה יונה</title>
+  <meta name="description" content="טופס קצר ופשוט לפרטי האירוע — ממלאים בכמה דקות ושולחים לדיג'יי ידידיה יונה בוואטסאפ" />
 
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
 
   <!-- Open Graph / WhatsApp / Facebook preview -->
   <meta property="og:site_name" content="ידידיה יונה · DJ" />
-  <meta property="og:title" content="איפיון אירוע · ידידיה יונה" />
-  <meta property="og:description" content="מלאו את פרטי האירוע — הכל יישלח ישירות לדיג'יי בלחיצה אחת" />
+  <meta property="og:title" content="טופס אירוע · ידידיה יונה" />
+  <meta property="og:description" content="ממלאים את פרטי האירוע בכמה דקות ושולחים לידידיה בוואטסאפ" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://dj-event-form.vercel.app/" />
   <meta property="og:image" content="https://dj-event-form.vercel.app/logo.png" />
@@ -25,8 +25,8 @@
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="איפיון אירוע · ידידיה יונה" />
-  <meta name="twitter:description" content="מלאו את פרטי האירוע — הכל יישלח ישירות לדיג'יי בלחיצה אחת" />
+  <meta name="twitter:title" content="טופס אירוע · ידידיה יונה" />
+  <meta name="twitter:description" content="ממלאים את פרטי האירוע בכמה דקות ושולחים לידידיה בוואטסאפ" />
   <meta name="twitter:image" content="https://dj-event-form.vercel.app/logo.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -84,44 +84,61 @@
       50%     { box-shadow: 0 0 0 1px rgba(212,175,106,.65), 0 12px 52px rgba(212,175,106,.42); }
     }
     .logo-glow { animation: logoPulse 3.6s ease-in-out infinite; }
-    .reveal { opacity: 0; transform: translateY(18px); }
-    .reveal.in { opacity: 1; transform: none; transition: opacity .5s ease, transform .5s ease; }
     #progressBar { transition: width .45s cubic-bezier(.4,0,.2,1); }
     .tip { background: rgba(212,175,106,0.08); border: 1px solid rgba(212,175,106,0.25); }
+
+    /* מדרגות (stepper) */
+    .stepdot { transition: all .25s ease; }
+    .stepdot.active { background: linear-gradient(180deg, #d4af6a, #b9914f); color: #0b0b12; border-color: #d4af6a; }
+    .stepdot.done { background: rgba(212,175,106,0.18); color: #e8d3a0; border-color: #d4af6a; }
+
+    /* מעבר בין שלבים */
+    .stepview { animation: fadeStep .35s ease; }
+    @keyframes fadeStep { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   </style>
 </head>
 
 <body class="bg-stage text-gray-100 min-h-screen">
 
   <div id="progressWrap" class="sticky top-0 z-30 h-1.5 w-full bg-panel2/80 backdrop-blur">
-    <div id="progressBar" class="h-full step-badge rounded-l-full" style="width:0%"></div>
+    <div id="progressBar" class="h-full step-badge rounded-l-full" style="width:25%"></div>
   </div>
 
-  <main id="formView" class="max-w-3xl mx-auto px-4 py-8 sm:py-12">
+  <main id="formView" class="max-w-2xl mx-auto px-4 py-8 sm:py-12">
 
-    <header class="text-center mb-8">
+    <header class="text-center mb-6">
       <img src="logo.png" alt="ידידיה יונה — דיג'יי" width="120" height="120"
-        class="logo-glow w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover" />
+        class="logo-glow w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto mb-4 object-cover" />
       <div class="text-gold text-sm tracking-[0.3em] font-semibold mb-1">ידידיה יונה · DJ</div>
-      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">איפיון אירוע</h1>
-      <p class="text-gray-400 mt-2 max-w-xl mx-auto">
-        כדי שנגיע לאירוע שלכם הכי מוכנים שיש — מלאו את הפרטים, השירים, האווירה והדגשים החשובים.
-        זה יעזור לנו לבנות לכם אירוע מדויק, שמח ומותאם אישית.
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">טופס פרטי האירוע</h1>
+      <p class="text-gray-400 mt-2 max-w-lg mx-auto text-sm sm:text-base">
+        טופס קצר ופשוט — ממלאים בכמה דקות, וזה עוזר לידידיה להגיע מוכן בדיוק לאירוע שלכם.
       </p>
-      <p class="text-xs text-gray-500 mt-3">🔒 כל מה שתמלאו נשמר אוטומטית במכשיר שלכם · זמן מילוי משוער: 3–5 דקות</p>
+      <p class="text-xs text-gray-500 mt-3">🔒 נשמר אוטומטית במכשיר שלכם · זמן מילוי: 3–5 דקות</p>
     </header>
+
+    <!-- מדרגות -->
+    <div class="flex items-center justify-center gap-2 sm:gap-3 mb-6 text-xs sm:text-sm">
+      <div class="flex items-center gap-2"><span data-dot="1" class="stepdot active w-7 h-7 rounded-full border border-line flex items-center justify-center font-bold">1</span></div>
+      <div class="w-5 sm:w-8 h-px bg-line"></div>
+      <div class="flex items-center gap-2"><span data-dot="2" class="stepdot w-7 h-7 rounded-full border border-line flex items-center justify-center font-bold">2</span></div>
+      <div class="w-5 sm:w-8 h-px bg-line"></div>
+      <div class="flex items-center gap-2"><span data-dot="3" class="stepdot w-7 h-7 rounded-full border border-line flex items-center justify-center font-bold">3</span></div>
+      <div class="w-5 sm:w-8 h-px bg-line"></div>
+      <div class="flex items-center gap-2"><span data-dot="4" class="stepdot w-7 h-7 rounded-full border border-line flex items-center justify-center font-bold">4</span></div>
+    </div>
 
     <form id="eventForm" class="space-y-6" novalidate>
 
-      <!-- 1 · פרטי האירוע -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+      <!-- שלב 1 · פרטי האירוע -->
+      <section data-step="1" class="stepview bg-panel rounded-2xl border border-line p-6 sm:p-7">
         <div class="flex items-center gap-3 mb-5">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">1</span>
           <h2 class="text-xl font-bold">פרטי האירוע</h2>
         </div>
 
         <div class="grid sm:grid-cols-2 gap-4">
-          <div>
+          <div class="sm:col-span-2">
             <label class="block text-sm text-gray-300 mb-1.5">סוג האירוע <span class="text-gold">*</span></label>
             <select name="event_type" required class="field w-full rounded-xl px-4 py-3 text-gray-100">
               <option value="" disabled selected>בחרו סוג אירוע…</option>
@@ -132,8 +149,8 @@
               <option>מסיבת סיום</option><option>אחר</option>
             </select>
           </div>
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שמות החוגגים / שם הלקוח <span class="text-gold">*</span></label>
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">שם הלקוח / שמות החוגגים <span class="text-gold">*</span></label>
             <input type="text" name="couple" required placeholder="לדוגמה: דנה ויוסי"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
@@ -143,268 +160,207 @@
             <input type="date" name="date" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
           <div>
-            <label class="block text-sm text-gray-300 mb-1.5">כמות אורחים משוערת</label>
+            <label class="block text-sm text-gray-300 mb-1.5">שעת התחלה <span class="text-gold">*</span></label>
+            <input type="time" name="start_time" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">כמות אורחים משוערת <span class="text-gray-500">(רשות)</span></label>
             <input type="number" name="guests" min="1" inputmode="numeric" placeholder="לדוגמה: 250"
-              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
-          </div>
-
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שעת קבלת פנים <span class="text-gold">*</span></label>
-            <input type="time" name="reception" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שעת הרגע המרכזי <span class="text-gold">*</span> <span class="text-gray-500">(חופה / פתיחה / נאום)</span></label>
-            <input type="time" name="ceremony" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
-          </div>
-
-          <div class="sm:col-span-2">
-            <label class="block text-sm text-gray-300 mb-2">אופי הקהל</label>
-            <div id="audience" class="flex flex-wrap gap-2"></div>
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-sm text-gray-300 mb-1.5">טווח גילאים מרכזי <span class="text-gray-500">(רשות)</span></label>
-            <input type="text" name="age_range" placeholder="לדוגמה: 25–45, או 'מגוון רחב'"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
         </div>
       </section>
 
-      <!-- 2 · מיקום ואנשי קשר -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+      <!-- שלב 2 · מיקום ואנשי קשר -->
+      <section data-step="2" class="stepview bg-panel rounded-2xl border border-line p-6 sm:p-7 hidden">
         <div class="flex items-center gap-3 mb-5">
           <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">2</span>
           <h2 class="text-xl font-bold">מיקום ואנשי קשר</h2>
         </div>
 
         <div class="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שם המקום / האולם <span class="text-gold">*</span></label>
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">שם האולם / מקום האירוע <span class="text-gold">*</span></label>
             <input type="text" name="venue" required placeholder="שם האולם / גן האירועים"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">כתובת מלאה</label>
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">מספר טלפון <span class="text-gold">*</span></label>
+            <input type="tel" name="contact_phone" required inputmode="tel" placeholder="050-0000000"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">כתובת מלאה <span class="text-gray-500">(רשות)</span></label>
             <input type="text" name="address" placeholder="רחוב, מספר, עיר"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
           <div class="sm:col-span-2">
-            <label class="block text-sm text-gray-300 mb-1.5">קישור ניווט (Waze / Google Maps)</label>
+            <label class="block text-sm text-gray-300 mb-1.5">קישור ניווט (Waze / Google Maps) <span class="text-gray-500">(רשות)</span></label>
             <input type="url" name="nav_link" placeholder="https://..." inputmode="url"
               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
               class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
           </div>
-
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">טלפון איש קשר ראשי <span class="text-gold">*</span></label>
-            <input type="tel" name="contact_phone" required inputmode="tel" placeholder="050-0000000"
-              class="field w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
-          </div>
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">איש קשר נוסף <span class="text-gray-500">(גיבוי)</span></label>
+          <div class="sm:col-span-2">
+            <label class="block text-sm text-gray-300 mb-1.5">איש קשר נוסף <span class="text-gray-500">(רשות · גיבוי)</span></label>
             <input type="text" name="contact2" placeholder="שם וטלפון"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
-          <div class="sm:col-span-2">
-            <label class="block text-sm text-gray-300 mb-1.5">איש קשר מטעם האולם / מנהל אירוע</label>
-            <input type="text" name="venue_contact" placeholder="שם וטלפון"
+        </div>
+      </section>
+
+      <!-- שלב 3 · מוזיקה ואווירה -->
+      <section data-step="3" class="stepview bg-panel rounded-2xl border border-line p-6 sm:p-7 hidden">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">3</span>
+          <h2 class="text-xl font-bold">מוזיקה ואווירה</h2>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm text-gray-300 mb-2">סגנון מוזיקלי כללי <span class="text-gold">*</span> <span class="text-gray-500">(אפשר לבחור כמה)</span></label>
+          <div id="music_style" class="flex flex-wrap gap-2"></div>
+          <p id="styleErr" class="hidden text-sm text-red-400 mt-2">בחרו לפחות סגנון מוזיקלי אחד.</p>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm text-gray-300 mb-1.5">כמה חופש מוזיקלי אתם נותנים לידידיה בזמן האירוע? <span class="text-gray-500">(רשות)</span></label>
+          <select name="dj_freedom" class="field w-full rounded-xl px-4 py-3 text-gray-100">
+            <option value="" disabled selected>בחרו…</option>
+            <option>חופש מלא</option>
+            <option>לפי הסגנון שבחרנו</option>
+            <option>רק לפי רשימת השירים שלנו</option>
+            <option>לא בטוחים — נשמח שידידיה יכוון אותנו</option>
+          </select>
+        </div>
+
+        <!-- שירי מפתח · חתונה -->
+        <div id="wedding_songs" class="space-y-4 mb-6 hidden">
+          <div class="tip rounded-xl px-4 py-3 text-sm text-goldsoft">🎵 שירים חשובים לחתונה (רשות) — אפשר להדביק שם שיר או קישור מיוטיוב/ספוטיפיי.</div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שיר חופה <span class="text-gray-500">(רשות)</span></label>
+            <input type="text" name="song_chupah" placeholder="שם שיר או קישור"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שיר שבירת כוס <span class="text-gray-500">(רשות)</span></label>
+            <input type="text" name="song_glass" placeholder="שם שיר או קישור"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שיר סלואו <span class="text-gray-500">(רשות)</span></label>
+            <input type="text" name="song_slow" placeholder="שם שיר או קישור"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
         </div>
-      </section>
 
-      <!-- 3 · ציוד וטכני -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">3</span>
-          <h2 class="text-xl font-bold">ציוד וטכני</h2>
-        </div>
-        <p class="text-sm text-gray-400 mb-4">סמנו מה רלוונטי — זה עוזר לי להגיע עם הציוד הנכון.</p>
-        <div id="equipment" class="flex flex-wrap gap-2"></div>
-      </section>
-
-      <!-- 4 · שירי מפתח -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">4</span>
-          <h2 class="text-xl font-bold">שירי מפתח</h2>
-        </div>
-        <div class="tip rounded-xl px-4 py-3 text-sm text-goldsoft mb-5">
-          💡 כאן מכניסים רק את השירים שבאמת חשובים לכם. את שאר הזרימה המוזיקלית נבנה לפי הקהל והרחבה בזמן אמת.
-          הדביקו קישור מ-<b>יוטיוב</b> או <b>ספוטיפיי</b>.
+        <!-- שירי מפתח · בר/בת מצווה -->
+        <div id="mitzvah_songs" class="space-y-4 mb-6 hidden">
+          <div class="tip rounded-xl px-4 py-3 text-sm text-goldsoft">🎵 שירים חשובים לבר/בת המצווה (רשות) — אפשר להדביק שם שיר או קישור.</div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שיר כניסה <span class="text-gray-500">(רשות)</span></label>
+            <input type="text" name="song_entrance" placeholder="שם שיר או קישור"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שיר מרכזי <span class="text-gray-500">(רשות)</span></label>
+            <input type="text" name="song_main" placeholder="שם שיר או קישור"
+              class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שירי משפחה <span class="text-gray-500">(רשות)</span></label>
+            <textarea name="song_family" rows="2" placeholder="שירים שחשובים למשפחה..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
+          </div>
         </div>
 
+        <!-- שירי חובה / אסורים · לכל סוגי האירועים -->
         <div class="space-y-4">
           <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שיר כניסה / פתיחת האירוע</label>
-            <input type="url" name="song_opening" placeholder="https://..." inputmode="url"
-              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-              class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
-          </div>
-
-          <div id="wedding_songs" class="space-y-4 hidden">
-            <div>
-              <label class="block text-sm text-gray-300 mb-1.5">שיר כניסה לחופה</label>
-              <input type="url" name="song_chupah" placeholder="https://..." inputmode="url"
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
-            </div>
-            <div>
-              <label class="block text-sm text-gray-300 mb-1.5">שיר שבירת כוס</label>
-              <input type="url" name="song_glass" placeholder="https://..." inputmode="url"
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
-            </div>
-            <div>
-              <label class="block text-sm text-gray-300 mb-1.5">שיר סלואו ראשון</label>
-              <input type="url" name="song_slow" placeholder="https://..." inputmode="url"
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שיר לרגע מיוחד <span class="text-gray-500">(עליה לתורה / נאום / הפתעה)</span></label>
-            <input type="url" name="song_special" placeholder="https://..." inputmode="url"
-              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-              class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
+            <label class="block text-sm text-gray-300 mb-1.5">✅ שירים שחייבים להיות באירוע <span class="text-gray-500">(רשות)</span></label>
+            <textarea name="must_play" rows="3" placeholder="כתבו שמות שירים או קישורים — כל שיר בשורה נפרדת..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
           </div>
           <div>
-            <label class="block text-sm text-gray-300 mb-1.5">שיר סיום האירוע</label>
-            <input type="url" name="song_closing" placeholder="https://..." inputmode="url"
-              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-              class="field song-url w-full rounded-xl px-4 py-3 text-gray-100 ltr" />
-          </div>
-
-          <div class="grid sm:grid-cols-2 gap-4 pt-2">
-            <div>
-              <label class="block text-sm text-gray-300 mb-1.5">🎤 אמנים אהובים</label>
-              <textarea name="artists_love" rows="3" placeholder="אמנים שתשמחו לשמוע..."
-                class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm text-gray-300 mb-1.5">🚫 אמנים לא רצויים</label>
-              <textarea name="artists_avoid" rows="3" placeholder="אמנים שעדיף להימנע מהם..."
-                class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
-            </div>
+            <label class="block text-sm text-gray-300 mb-1.5">⛔ שירים שאסור להשמיע באירוע <span class="text-gray-500">(רשות)</span></label>
+            <textarea name="do_not_play" rows="3" placeholder="שירים, אמנים או סגנונות שעדיף להימנע מהם..."
+              class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
           </div>
         </div>
       </section>
 
-      <!-- 5 · אווירה וסגנון -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
+      <!-- שלב 4 · דגשים אחרונים ושליחה -->
+      <section data-step="4" class="stepview bg-panel rounded-2xl border border-line p-6 sm:p-7 hidden">
         <div class="flex items-center gap-3 mb-5">
-          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">5</span>
-          <h2 class="text-xl font-bold">עיצוב האווירה</h2>
-        </div>
-
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-goldsoft mb-3">אווירה בקבלת הפנים</label>
-          <div id="reception_vibe" class="flex flex-wrap gap-2"></div>
-          <div id="reception_vibe_other_wrap" class="hidden mt-3">
-            <input type="text" name="reception_vibe_other" placeholder="פרטו את ה'אחר'..."
-              class="field w-full rounded-xl px-4 py-2.5 text-gray-100" />
-          </div>
-        </div>
-
-        <div class="mb-6">
-          <label class="block text-sm font-semibold text-goldsoft mb-3">סגנונות לרחבת הריקודים</label>
-          <div id="dancefloor_styles" class="flex flex-wrap gap-2"></div>
-          <div id="dancefloor_styles_other_wrap" class="hidden mt-3">
-            <input type="text" name="dancefloor_styles_other" placeholder="פרטו את ה'אחר'..."
-              class="field w-full rounded-xl px-4 py-2.5 text-gray-100" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-semibold text-goldsoft mb-1.5">רמת חופש לדיג'יי</label>
-          <p class="text-xs text-gray-500 mb-2">כמה חופש מוזיקלי לתת לי בזמן אמת?</p>
-          <select name="dj_freedom" class="field w-full rounded-xl px-4 py-3 text-gray-100">
-            <option value="" disabled selected>בחרו…</option>
-            <option>חופש מלא — סמכו עליי לקרוא את הרחבה</option>
-            <option>איזון — בעיקר אני, עם הדגשים שלכם</option>
-            <option>שליטה גבוהה — בעיקר לפי הרשימה שלכם</option>
-          </select>
-        </div>
-      </section>
-
-      <!-- 6 · חוקי הברזל -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
-        <div class="flex items-center gap-3 mb-3">
-          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">6</span>
-          <h2 class="text-xl font-bold">חוקי הברזל</h2>
-        </div>
-        <div class="tip rounded-xl px-4 py-3 text-sm text-goldsoft mb-5">
-          ⚠️ זה המקום לרגישויות אמיתיות בלבד. רשימות ארוכות מדי עלולות להגביל את הזרימה ברחבה — בחרו רק את מה שחשוב באמת.
+          <span class="step-badge w-8 h-8 rounded-lg flex items-center justify-center font-bold">4</span>
+          <h2 class="text-xl font-bold">דגשים אחרונים</h2>
         </div>
 
         <div class="space-y-5">
           <div>
             <label class="block text-sm text-gray-300 mb-1.5">
-              ✅ שירים שחייבים להתנגן <span class="text-gray-500">(Must Play)</span>
+              יש משהו שחשוב שידידיה ידע לפני האירוע? <span class="text-gray-500">(רשות)</span>
             </label>
-            <textarea name="must_play" rows="4" placeholder="שמות שירים או קישורים, כל שיר בשורה נפרדת..."
+            <p class="text-xs text-gray-500 mb-2">מבחינת הגברה, חשמל, במה, כניסה לאולם, מגבלות במקום או משהו טכני אחר.</p>
+            <textarea name="tech_notes" rows="3" placeholder="כתבו כאן כל דבר טכני שחשוב שנדע מראש..."
               class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
           </div>
           <div>
-            <label class="block text-sm text-gray-300 mb-1.5">
-              ⛔ הרשימה השחורה <span class="text-gray-500">(Do Not Play)</span>
-            </label>
-            <textarea name="do_not_play" rows="4" placeholder="שירים, אמנים או סגנונות שאסור להשמיע..."
+            <label class="block text-sm text-gray-300 mb-1.5">הערות ובקשות מיוחדות <span class="text-gray-500">(רשות)</span></label>
+            <textarea name="notes" rows="3" placeholder="כל דבר נוסף שתרצו שנדע..."
               class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
           </div>
-          <div>
-            <label class="block text-sm text-gray-300 mb-1.5">דגשים ובקשות מיוחדות <span class="text-gray-500">(רשות)</span></label>
-            <textarea name="notes" rows="3" placeholder="מגבלות משפחה / דתיות, הפרדה, רב, בקשות מיוחדות, הערות גישה לאולם..."
-              class="field w-full rounded-xl px-4 py-3 text-gray-100"></textarea>
-          </div>
+
+          <label class="flex items-start gap-3 cursor-pointer pt-2">
+            <input type="checkbox" name="confirm" id="confirm" class="mt-1 w-5 h-5 shrink-0" style="accent-color:#d4af6a" />
+            <span class="text-sm text-gray-300">הפרטים שמילאתי נכונים ומוכנים לשליחה לידידיה.</span>
+          </label>
+          <p id="confirmErr" class="hidden text-sm text-red-400">יש לאשר שהפרטים נכונים לפני השליחה.</p>
         </div>
       </section>
 
-      <!-- אישור ושליחה -->
-      <section class="bg-panel rounded-2xl border border-line p-6 sm:p-7">
-        <label class="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" name="confirm" id="confirm" class="mt-1 w-5 h-5 shrink-0" style="accent-color:#d4af6a" />
-          <span class="text-sm text-gray-300">אני מאשר/ת שכל הפרטים שמילאתי נכונים ומוכנים לשליחה לידידיה.</span>
-        </label>
-        <p id="confirmErr" class="hidden text-sm text-red-400 mt-2">יש לאשר שהפרטים נכונים לפני השליחה.</p>
-      </section>
-
-      <button type="submit"
-        class="sticky bottom-4 z-20 w-full step-badge font-bold text-lg rounded-2xl py-4 shadow-xl shadow-black/40 hover:brightness-110 active:scale-[.99] transition">
-        סיום ושליחה לידידיה 🎉
-      </button>
-      <p class="text-center text-xs text-gray-500 pb-4">הפרטים נשלחים ישירות לידידיה בלבד · משמשים אך ורק להכנת האירוע שלכם.</p>
+      <!-- ניווט בין שלבים -->
+      <div class="sticky bottom-4 z-20 flex gap-3">
+        <button type="button" id="backBtn"
+          class="hidden flex-1 bg-panel2 border border-line text-gray-200 font-semibold rounded-2xl py-4 hover:border-gold active:scale-[.99] transition">
+          ← חזרה
+        </button>
+        <button type="button" id="nextBtn"
+          class="flex-1 step-badge font-bold text-lg rounded-2xl py-4 shadow-xl shadow-black/40 hover:brightness-110 active:scale-[.99] transition">
+          המשך →
+        </button>
+        <button type="submit" id="submitBtn"
+          class="hidden flex-1 step-badge font-bold text-lg rounded-2xl py-4 shadow-xl shadow-black/40 hover:brightness-110 active:scale-[.99] transition">
+          סיום ושליחה 🎉
+        </button>
+      </div>
+      <p class="text-center text-xs text-gray-500 pb-4">הפרטים משמשים אך ורק להכנת האירוע שלכם.</p>
     </form>
   </main>
 
   <!-- מסך הצלחה -->
   <section id="successView" class="hidden max-w-xl mx-auto px-4 py-16 text-center">
     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full step-badge text-4xl mb-6">✓</div>
-    <h2 class="text-3xl font-extrabold mb-3">מעולה, הפרטים מוכנים!</h2>
-    <p class="text-gray-400 mb-8">נשאר רק לשלוח אותם לידידיה — לחצו על הכפתור, ההודעה תיפתח מסודרת עם כל הפרטים. רק ללחוץ "שלח". 👇</p>
+    <h2 class="text-2xl sm:text-3xl font-extrabold mb-3">תודה, הפרטים נשמרו בהצלחה</h2>
+    <p class="text-gray-400 mb-8 max-w-md mx-auto">
+      עכשיו אפשר לשלוח לידידיה את סיכום האירוע בוואטסאפ. אם חסר משהו, ידידיה יצור איתכם קשר.
+    </p>
 
     <a id="whatsappBtn" href="#" target="_blank" rel="noopener"
       class="inline-flex items-center justify-center gap-3 w-full bg-[#25D366] text-[#0b1f12] font-bold text-lg rounded-2xl py-4 hover:brightness-105 active:scale-[.99] transition">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.52 0-3.01-.41-4.3-1.18l-.31-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.35c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.82c0 4.54-3.7 8.23-8.23 8.23z"/></svg>
-      שלחו את פרטי האירוע לידידיה בוואטסאפ
+      לחצו כאן כדי לפתוח וואטסאפ לידידיה ולשלוח את סיכום האירוע
     </a>
 
-    <p id="pdfNote" class="hidden text-xs text-goldsoft mt-4">📎 הרשימות שלכם ארוכות — מומלץ גם להוריד את ה-PDF ולצרף אותו להודעה.</p>
-
-    <p id="calNote" class="text-xs text-goldsoft mt-4">📅 רוצים שלא לשכוח? הוסיפו את האירוע ליומן עם תזכורות אוטומטיות — 3 ימים לפני ובבוקר יום האירוע.</p>
+    <p class="text-xs text-goldsoft mt-4">📎 רוצים שלידידיה יקבל הכל מסודר? הורידו את ה-PDF וצרפו אותו להודעת הוואטסאפ.</p>
 
     <div class="mt-6 flex flex-col items-center gap-3">
-      <button id="calBtn" type="button"
-        class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
-        📅 הוספת האירוע ליומן עם תזכורות
-      </button>
       <button id="pdfBtn" type="button"
         class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
-        ⬇️ הורדת דף האירוע (PDF) מסודר
+        ⬇️ הורדת סיכום האירוע (PDF)
       </button>
       <button id="newFormBtn" type="button" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
     </div>
-    <p class="mt-6 text-xs text-gray-500">ההודעה וה-PDF בנויים כדף עבודה לדיג'יי — תקציר, לו"ז, מוזיקה, ציוד וחוסרים לבדיקה.</p>
   </section>
 
   <div id="pdfTemplate" class="hidden-real"></div>
@@ -412,16 +368,14 @@
   <script>
     // ---------- פרטי הדיג'יי ----------
     const DJ = { name: 'ידידיה יונה', phone: '972535918939' };
-    const DRAFT_KEY = 'dj_event_draft_v2';
+    const DRAFT_KEY = 'dj_event_draft_v3';
     const form = document.getElementById('eventForm');
 
-    // ---------- אפשרויות הצ'יפים ----------
-    const RECEPTION = ['צ\'יל אאוט', 'ג\'אז', 'דיפ האוס', 'רוק רך', 'ישראלי שקט', 'אחר'];
-    const DANCEFLOOR = ['מיינסטרים', 'פופ', 'היפ הופ', 'טכנו/האוס', 'רגאטון', 'מזרחית/ים תיכוני', 'שנות ה-90', 'שנות ה-2000', 'טראנס', 'לטיני', 'חסידי', 'רוק', 'אחר'];
-    const AUDIENCE = ['חילוני', 'מסורתי', 'דתי', 'חרדי', 'מעורב', 'משפחות', 'צעירים', 'קהל עסקי'];
-    const EQUIPMENT = ['צריך הגברה מלאה מהדיג\'יי', 'יש הגברה קבועה במקום', 'מיקרופון אלחוטי לנאומים', 'תאורה לרחבה', 'האירוע בחוץ / משולב'];
-    const CHIP_GROUPS = ['reception_vibe', 'dancefloor_styles', 'audience', 'equipment'];
+    // ---------- סגנונות מוזיקליים (צ'יפים) ----------
+    const STYLES = ['מיינסטרים', 'פופ', 'היפ הופ', 'טכנו/האוס', 'רגאטון', 'מזרחית/ים תיכוני', 'שנות ה-90', 'שנות ה-2000', 'לטיני', 'חסידי', 'רוק'];
+    const CHIP_GROUPS = ['music_style'];
     const WEDDING_TYPES = ['חתונה', 'חינה'];
+    const MITZVAH_TYPES = ['בר מצווה', 'בת מצווה'];
 
     function buildChips(containerId, options, groupName) {
       const wrap = document.getElementById(containerId);
@@ -432,28 +386,19 @@
         const input = label.querySelector('input');
         input.addEventListener('change', () => {
           label.classList.toggle('checked', input.checked);
-          if (opt === 'אחר') toggleOther(groupName);
+          document.getElementById('styleErr').classList.add('hidden');
           onFormChange();
         });
         wrap.appendChild(label);
       });
     }
-    buildChips('reception_vibe', RECEPTION, 'reception_vibe');
-    buildChips('dancefloor_styles', DANCEFLOOR, 'dancefloor_styles');
-    buildChips('audience', AUDIENCE, 'audience');
-    buildChips('equipment', EQUIPMENT, 'equipment');
-
-    function toggleOther(group) {
-      const wrap = document.getElementById(group + '_other_wrap');
-      if (!wrap) return;
-      const other = document.querySelector(`input[name="${group}"][value="אחר"]`);
-      wrap.classList.toggle('hidden', !(other && other.checked));
-    }
+    buildChips('music_style', STYLES, 'music_style');
 
     // ---------- שדות מותנים לפי סוג אירוע ----------
     function updateEventType() {
-      const wed = WEDDING_TYPES.includes(form.event_type.value);
-      document.getElementById('wedding_songs').classList.toggle('hidden', !wed);
+      const t = form.event_type.value;
+      document.getElementById('wedding_songs').classList.toggle('hidden', !WEDDING_TYPES.includes(t));
+      document.getElementById('mitzvah_songs').classList.toggle('hidden', !MITZVAH_TYPES.includes(t));
     }
     form.event_type.addEventListener('change', () => { updateEventType(); onFormChange(); });
 
@@ -466,7 +411,7 @@
       if (!v) return '';
       const m = v.match(/https?:\/\/\S+/i);
       if (m) return m[0];
-      return v.split(/\s+/)[0];
+      return v;
     }
     document.querySelectorAll('.song-url').forEach(el => {
       el.addEventListener('blur', () => {
@@ -478,11 +423,6 @@
     function getChecked(name) {
       return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
     }
-    function withOther(arr, otherVal) {
-      const t = (otherVal || '').trim();
-      return arr.map(v => v === 'אחר' ? (t ? 'אחר: ' + t : 'אחר') : v);
-    }
-    const ltrIso = (s) => `<span style="display:inline-block;direction:ltr;unicode-bidi:isolate;">${s}</span>`;
 
     function linkify(text) {
       return esc(text).split('\n').map(line => {
@@ -495,342 +435,136 @@
     }
 
     // ---------- איסוף נתונים ----------
-    const TEXT_FIELDS = ['event_type', 'couple', 'date', 'guests', 'reception', 'ceremony', 'age_range',
-      'venue', 'address', 'nav_link', 'contact_phone', 'contact2', 'venue_contact',
-      'song_opening', 'song_chupah', 'song_glass', 'song_slow', 'song_special', 'song_closing',
-      'artists_love', 'artists_avoid', 'dj_freedom', 'must_play', 'do_not_play', 'notes',
-      'reception_vibe_other', 'dancefloor_styles_other'];
-    const URL_FIELDS = ['nav_link', 'song_opening', 'song_chupah', 'song_glass', 'song_slow', 'song_special', 'song_closing'];
+    const TEXT_FIELDS = ['event_type', 'couple', 'date', 'start_time', 'guests',
+      'venue', 'contact_phone', 'address', 'nav_link', 'contact2',
+      'dj_freedom', 'song_chupah', 'song_glass', 'song_slow',
+      'song_entrance', 'song_main', 'song_family',
+      'must_play', 'do_not_play', 'tech_notes', 'notes'];
+    const URL_FIELDS = ['nav_link'];
 
     function collectData() {
       const d = {};
       TEXT_FIELDS.forEach(n => { d[n] = (form[n].value || '').trim(); });
       URL_FIELDS.forEach(n => { d[n] = cleanUrl(form[n].value); });
-      d.reception_vibe = withOther(getChecked('reception_vibe'), form.reception_vibe_other.value);
-      d.dancefloor_styles = withOther(getChecked('dancefloor_styles'), form.dancefloor_styles_other.value);
-      d.audience = getChecked('audience');
-      d.equipment = getChecked('equipment');
+      d.music_style = getChecked('music_style');
       return d;
     }
 
-    // ---------- מודיעין: רמת חופש + חוסרים ----------
-    function freedomLevel(v) {
-      if (!v) return '';
-      if (v.indexOf('חופש מלא') === 0) return 'גבוהה';
-      if (v.indexOf('איזון') === 0) return 'בינונית';
-      if (v.indexOf('שליטה') === 0) return 'נמוכה';
-      return '';
-    }
-    // חוסרים שנגזרים מהנתונים שהלקוח כן יכול היה למלא (קובעים את הודעת "הכל מולא")
-    function buildGaps(d) {
+    // ---------- הודעת וואטסאפ (קצרה ומסודרת) ----------
+    function buildWhatsappText(d) {
       const wedding = WEDDING_TYPES.includes(d.event_type);
-      const g = [];
-      if (!d.nav_link) g.push('חסר קישור ניווט');
-      if (!d.contact2) g.push('חסר איש קשר גיבוי');
-      if (!d.must_play) g.push('לא הוגדרו שירי חובה');
-      if (!d.do_not_play && !d.artists_avoid) g.push('לא הוגדרו שירים אסורים');
-      if (wedding && !d.song_chupah) g.push('חסר שיר כניסה לחופה');
-      if (wedding && !d.song_slow) g.push('חסר שיר סלואו ראשון');
-      return g;
-    }
-    const VERIFY_REMINDER = 'שעת סיום · חשמל בעמדה · חניה · גישה לפריקה · מגבלות רעש';
-    const MISS = 'חסר — להשלים מול הלקוח';
-
-    // ---------- הודעת וואטסאפ (במבנה דף קרב) ----------
-    const WA_MAX = 6000;
-    let needsPdf = false;
-    function trimList(text) {
-      const lines = (text || '').split('\n').filter(l => l.trim());
-      if (lines.length <= 6) return text;
-      return lines.slice(0, 6).join('\n') + '\n…(הרשימה המלאה ב-PDF)';
-    }
-    function buildWhatsappText(d, trim) {
+      const mitzvah = MITZVAH_TYPES.includes(d.event_type);
+      const join = a => a.length ? a.join(', ') : '';
       const L = (label, val) => val ? `${label}: ${val}` : null;
-      const join = a => a.length ? a.join(' · ') : '';
-      const wedding = WEDDING_TYPES.includes(d.event_type);
-      const gaps = buildGaps(d);
-      const must = (trim ? trimList(d.must_play) : d.must_play);
-      const dnp = (trim ? trimList(d.do_not_play) : d.do_not_play);
-      const freedom = freedomLevel(d.dj_freedom);
-      const has = kw => d.equipment.some(x => x.indexOf(kw) !== -1);
 
-      let p = [`🎧 *תיק אירוע לדיג'יי*`, `*${d.event_type || 'אירוע'}* — ${d.couple || ''}`, ``];
+      const p = [
+        'היי ידידיה, מילאנו את טופס האירוע 🎧',
+        'מצורף סיכום מסודר עם כל הפרטים החשובים:',
+        '',
+        L('🎉 סוג אירוע', d.event_type),
+        L('👤 לקוח', d.couple),
+        L('📅 תאריך', fmtDate(d.date)),
+        L('🕐 שעת התחלה', d.start_time),
+        L('📍 מקום', d.venue),
+        L('🗺️ כתובת', d.address),
+        L('🧭 ניווט', d.nav_link),
+        L('👥 אורחים', d.guests),
+        L('📞 טלפון', d.contact_phone),
+        L('🎵 סגנון מוזיקלי', join(d.music_style)),
+        L("🎚️ חופש לדיג'יי", d.dj_freedom),
+      ];
 
-      // חוסרים בראש ההודעה
-      if (gaps.length) {
-        p.push('⚠️ *חוסרים לסגור לפני האירוע*');
-        gaps.forEach(x => p.push('• ' + x));
-      } else {
-        p.push('✅ *כל הפרטים הקריטיים מולאו*');
+      const songs = [];
+      if (wedding) {
+        if (d.song_chupah) songs.push('חופה: ' + d.song_chupah);
+        if (d.song_glass) songs.push('שבירת כוס: ' + d.song_glass);
+        if (d.song_slow) songs.push('סלואו: ' + d.song_slow);
+      } else if (mitzvah) {
+        if (d.song_entrance) songs.push('כניסה: ' + d.song_entrance);
+        if (d.song_main) songs.push('מרכזי: ' + d.song_main);
+        if (d.song_family) songs.push('משפחה: ' + d.song_family);
       }
-      p.push('🔎 לוודא מול האולם: ' + VERIFY_REMINDER, '');
+      if (songs.length) { p.push('', '🎼 שירי מפתח:'); songs.forEach(s => p.push('• ' + s)); }
 
-      // 1 · תקציר אירוע
-      p.push('━━━━━━━━', '📋 *תקציר אירוע*');
-      p.push(L('📅 תאריך', fmtDate(d.date)));
-      p.push(L('📍 מקום', d.venue));
-      if (d.address) p.push(L('🗺️ כתובת', d.address));
-      p.push('🧭 ניווט: ' + (d.nav_link || MISS));
-      if (d.guests) p.push(L('👥 אורחים', d.guests));
-      p.push('🕐 התחלה / קבלת פנים: ' + (d.reception || MISS));
-      p.push('⭐ רגע מרכזי: ' + (d.ceremony || MISS));
-      p.push(L('📞 איש קשר', d.contact_phone));
-      p.push('');
-
-      // 2 · קריטי לדיג'יי
-      p.push('━━━━━━━━', `🎯 *קריטי לדיג'יי*`);
-      if (d.audience.length) p.push(L('קהל', join(d.audience)));
-      if (d.age_range) p.push(L('גילאים', d.age_range));
-      if (d.dancefloor_styles.length) p.push(L('סגנונות', join(d.dancefloor_styles)));
-      if (freedom) p.push(`חופש לדיג'יי: ${freedom}`);
-      p.push('✅ חובה לנגן:\n' + (must || 'לא הוגדר'));
-      p.push('⛔ אסור לנגן:\n' + (dnp || 'לא הוגדר'));
-      if (d.artists_love) p.push(L('❤️ אמנים אהובים', d.artists_love));
-      if (d.artists_avoid) p.push(L('🚫 אמנים לא רצויים', d.artists_avoid));
-      p.push('');
-
-      // 3 · לו"ז
-      p.push('━━━━━━━━', '⏱️ *לו"ז האירוע*');
-      p.push('קבלת פנים: ' + (d.reception || MISS));
-      p.push('כניסה / פתיחה: ' + (d.ceremony || MISS));
-      const moments = [];
-      if (wedding) moments.push('חופה', 'שבירת כוס', 'סלואו');
-      moments.push('אוכל', 'נאומים', 'ריקודים', 'סיום');
-      p.push('⚠️ ' + MISS + ':\n' + moments.join(' · '));
-      p.push('');
-
-      // 4 · ציוד וטכני
-      p.push('━━━━━━━━', '🔊 *ציוד וטכני*');
-      p.push('הגברה: ' + (has('הגברה מלאה') ? "מלאה מהדיג'יי" : has('הגברה קבועה') ? 'קבועה במקום' : 'חסר לבדיקה'));
-      p.push('תאורה: ' + (has('תאורה') ? 'נדרשת' : 'חסר לבדיקה'));
-      p.push('מיקרופון: ' + (has('מיקרופון') ? 'אלחוטי לנאומים' : 'חסר לבדיקה'));
-      p.push('חשמל / חניה / פריקה / רעש: חסר לבדיקה');
-      if (d.notes) p.push('📝 הערות: ' + d.notes);
-
-      // הוספה ליומן בלחיצה אחת — בסוף ההודעה כדי לא להפריע לקריאה (קישור מקוצר)
-      const gcal = googleCalUrl(d);
-      if (gcal) {
-        p.push('', '━━━━━━━━', '📅 *הוספה ליומן* (תזכורת 3 ימים לפני + ביום האירוע):', gcal);
-      }
+      if (d.must_play) p.push('', '✅ חייבים לנגן:', d.must_play);
+      if (d.do_not_play) p.push('', '⛔ אסור לנגן:', d.do_not_play);
+      if (d.tech_notes) p.push('', '🔌 דגשים טכניים: ' + d.tech_notes);
+      if (d.notes) p.push('', '📝 הערות: ' + d.notes);
 
       return p.filter(x => x !== null && x !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
     }
-    function waMessage(d) {
-      let text = buildWhatsappText(d, false);
-      needsPdf = false;
-      if (encodeURIComponent(text).length > WA_MAX) { text = buildWhatsappText(d, true); needsPdf = true; }
-      return text;
-    }
 
-    // ---------- PDF (במבנה דף קרב — עמוד 1: לוגיסטיקה, עמוד 2: מוזיקה/קהל/ציוד) ----------
+    // ---------- PDF (נקי וקצר, מחולק לפי אזורים) ----------
     function buildPdfHtml(d) {
-      const join = a => a.length ? a.join(' · ') : 'לא צוין';
       const wedding = WEDDING_TYPES.includes(d.event_type);
-      const gaps = buildGaps(d);
-      const freedom = freedomLevel(d.dj_freedom);
-      const has = kw => d.equipment.some(x => x.indexOf(kw) !== -1);
+      const mitzvah = MITZVAH_TYPES.includes(d.event_type);
+      const join = a => a.length ? a.join(' · ') : '';
       const TD = 'style="page-break-inside:avoid;"';
-      const row = (label, val, opt) => (opt && !val) ? '' :
-        `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;vertical-align:top;">${label}</td><td style="padding:6px 0;">${esc(val) || 'לא צוין'}</td></tr>`;
-      const missRow = (label) => `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;">${label}</td><td style="padding:6px 0;color:#c0392b;">${MISS}</td></tr>`;
-      const techRow = (label, val) => `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;">${label}</td><td style="padding:6px 0;${val ? '' : 'color:#c0392b;'}">${esc(val) || 'חסר — לבדיקה'}</td></tr>`;
-      const linkRow = (label, url, opt) => (opt && !url) ? '' :
-        `<tr ${TD}><td style="padding:6px 0;color:#666;width:40%;vertical-align:top;">${label}</td><td style="padding:6px 0;">${url ? `<a href="${esc(url)}" style="color:#1a73e8;word-break:break-all;">${esc(url)}</a>` : 'לא צוין'}</td></tr>`;
-      const H = (txt, color, bar) => `<h3 style="font-size:16px;color:${color || '#b9914f'};border-right:4px solid ${bar || '#d4af6a'};padding-right:10px;margin:20px 0 8px;">${txt}</h3>`;
+      const row = (label, val) => (!val) ? '' :
+        `<tr ${TD}><td style="padding:6px 0;color:#666;width:38%;vertical-align:top;">${esc(label)}</td><td style="padding:6px 0;">${esc(val)}</td></tr>`;
+      const H = (txt) => `<h3 style="font-size:16px;color:#b9914f;border-right:4px solid #d4af6a;padding-right:10px;margin:20px 0 8px;">${txt}</h3>`;
       const TBL = 'style="width:100%;font-size:14px;border-collapse:collapse;"';
+      const block = (txt) => txt ? `<div style="font-size:14px;line-height:1.9;">${linkify(txt)}</div>` : '<div style="font-size:14px;color:#999;">לא צוין</div>';
+
+      const songRows = wedding
+        ? row('שיר חופה', d.song_chupah) + row('שיר שבירת כוס', d.song_glass) + row('שיר סלואו', d.song_slow)
+        : mitzvah
+        ? row('שיר כניסה', d.song_entrance) + row('שיר מרכזי', d.song_main) + row('שירי משפחה', d.song_family)
+        : '';
 
       return `
       <div dir="rtl" style="font-family:'Heebo',Arial,sans-serif;box-sizing:border-box;width:760px;padding:40px;color:#1a1a1a;background:#fff;letter-spacing:0.3px;">
         <div style="text-align:center;border-bottom:3px solid #d4af6a;padding-bottom:16px;margin-bottom:18px;">
           <img src="logo.png" width="78" height="78" style="border-radius:50%;display:block;margin:0 auto 8px;" />
           <div style="font-size:13px;letter-spacing:3px;color:#b9914f;font-weight:700;">${esc(DJ.name)} · DJ</div>
-          <div style="font-size:26px;font-weight:800;margin-top:4px;">🎧 דף אירוע — ${esc(d.event_type) || 'אירוע'}</div>
+          <div style="font-size:26px;font-weight:800;margin-top:4px;">🎧 סיכום אירוע — ${esc(d.event_type) || 'אירוע'}</div>
           <div style="font-size:18px;color:#444;margin-top:2px;">${esc(d.couple) || ''}</div>
         </div>
 
-        <div style="border:2px solid #e74c3c;border-radius:10px;padding:12px 16px;margin-bottom:14px;background:#fff8f7;page-break-inside:avoid;">
-          <div style="font-size:14px;font-weight:800;color:#c0392b;margin-bottom:6px;">⚠️ חוסרים שצריך לסגור לפני האירוע</div>
-          ${gaps.length
-            ? `<div style="font-size:14px;line-height:1.85;">${gaps.map(g => '◆ ' + esc(g)).join('<br>')}</div>`
-            : '<div style="font-size:14px;color:#1a8a4a;font-weight:700;">✅ כל הפרטים הקריטיים מולאו</div>'}
-          <div style="font-size:12px;color:#777;margin-top:8px;border-top:1px dashed #f0c9c4;padding-top:6px;">🔎 לוודא מול האולם: ${VERIFY_REMINDER}</div>
-        </div>
+        ${H('פרטי לקוח')}
+        <table ${TBL}>
+          ${row('שם הלקוח', d.couple)}
+          ${row('טלפון', d.contact_phone)}
+        </table>
 
-        ${H('תקציר אירוע')}
+        ${H('פרטי אירוע')}
         <table ${TBL}>
           ${row('סוג אירוע', d.event_type)}
-          ${row('שמות החוגגים', d.couple)}
           ${row('תאריך', fmtDate(d.date))}
-          ${row('מקום', d.venue)}
-          ${row('כתובת', d.address, true)}
-          ${linkRow('קישור ניווט', d.nav_link, true)}
-          ${row('כמות אורחים', d.guests, true)}
-          ${row('שעת התחלה / קבלת פנים', d.reception)}
-          ${row('שעת רגע מרכזי', d.ceremony)}
+          ${row('שעת התחלה', d.start_time)}
+          ${row('כמות אורחים', d.guests)}
         </table>
 
-        ${H('אנשי קשר')}
+        ${H('מיקום ואנשי קשר')}
         <table ${TBL}>
-          ${row('ראשי', d.contact_phone)}
-          ${row('נוסף (גיבוי)', d.contact2, true)}
-          ${row('אולם / מנהל אירוע', d.venue_contact, true)}
+          ${row('מקום האירוע', d.venue)}
+          ${row('כתובת', d.address)}
+          ${d.nav_link ? `<tr ${TD}><td style="padding:6px 0;color:#666;width:38%;">קישור ניווט</td><td style="padding:6px 0;"><a href="${esc(d.nav_link)}" style="color:#1a73e8;word-break:break-all;">${esc(d.nav_link)}</a></td></tr>` : ''}
+          ${row('איש קשר נוסף', d.contact2)}
         </table>
 
-        ${H('לו"ז האירוע')}
+        ${H('מוזיקה ואווירה')}
         <table ${TBL}>
-          ${row('קבלת פנים', d.reception)}
-          ${row('כניסה / פתיחה', d.ceremony)}
-          ${wedding ? missRow('חופה') + missRow('שבירת כוס') + missRow('סלואו ראשון') : ''}
-          ${missRow('אוכל')}${missRow('נאומים')}${missRow('ריקודים')}${missRow('סיום אירוע')}
+          ${row('סגנון מוזיקלי', join(d.music_style))}
+          ${row("חופש לדיג'יי", d.dj_freedom)}
+          ${songRows}
         </table>
 
-        <div style="page-break-before:always;"></div>
+        ${H('✅ שירי חובה')}
+        ${block(d.must_play)}
 
-        ${H('✅ מוזיקה חובה ' + ltrIso('(Must Play)'), '#1a8a4a', '#25D366')}
-        <div style="font-size:14px;line-height:1.9;">${d.must_play ? linkify(d.must_play) : '<span style="color:#c0392b;">לא הוגדרו שירי חובה</span>'}</div>
+        ${H('⛔ שירים אסורים')}
+        ${block(d.do_not_play)}
 
-        ${H('⛔ מוזיקה אסורה ' + ltrIso('(Do Not Play)'), '#c0392b', '#e74c3c')}
-        <div style="font-size:14px;line-height:1.9;">${d.do_not_play ? linkify(d.do_not_play) : '<span style="color:#c0392b;">לא הוגדרו שירים אסורים</span>'}</div>
-
-        ${H('שירי מפתח')}
-        <table ${TBL}>
-          ${linkRow('כניסה / פתיחה', d.song_opening, true)}
-          ${linkRow('כניסה לחופה', d.song_chupah, true)}
-          ${linkRow('שבירת כוס', d.song_glass, true)}
-          ${linkRow('סלואו ראשון', d.song_slow, true)}
-          ${linkRow('רגע מיוחד', d.song_special, true)}
-          ${linkRow('סיום', d.song_closing, true)}
-          ${row('אמנים אהובים', d.artists_love, true)}
-          ${row('אמנים לא רצויים', d.artists_avoid, true)}
-        </table>
-
-        ${H('אופי הקהל')}
-        <table ${TBL}>
-          ${row('קהל', d.audience.length ? join(d.audience) : '', true)}
-          ${row('טווח גילאים', d.age_range, true)}
-          ${row('סגנונות לרחבה', d.dancefloor_styles.length ? join(d.dancefloor_styles) : '', true)}
-          ${row('אווירת קבלת פנים', d.reception_vibe.length ? join(d.reception_vibe) : '', true)}
-          ${row("רמת חופש לדיג'יי", freedom ? freedom + (d.dj_freedom ? ' (' + d.dj_freedom + ')' : '') : '', true)}
-        </table>
-
-        ${H('ציוד וטכני')}
-        <table ${TBL}>
-          ${techRow('הגברה', has('הגברה מלאה') ? "מלאה מהדיג'יי" : has('הגברה קבועה') ? 'קבועה במקום' : '')}
-          ${techRow('תאורה', has('תאורה') ? 'נדרשת לרחבה' : '')}
-          ${techRow('מיקרופון', has('מיקרופון') ? 'אלחוטי לנאומים' : '')}
-          ${techRow('חשמל בעמדה', '')}
-          ${techRow("חניה לדיג'יי", '')}
-          ${techRow('גישה לפריקה', '')}
-          ${techRow('מגבלות רעש', '')}
-          ${has('בחוץ') ? row('אירוע בחוץ / משולב', 'כן') : ''}
-        </table>
-
-        ${d.notes ? H('הערות ודגשים') + `<div style="font-size:14px;line-height:1.9;">${linkify(d.notes)}</div>` : ''}
+        ${(d.tech_notes || d.notes) ? H('הערות ודגשים חשובים') +
+          (d.tech_notes ? `<div style="font-size:14px;line-height:1.9;"><b style="color:#b9914f;">דגשים טכניים:</b> ${esc(d.tech_notes)}</div>` : '') +
+          (d.notes ? `<div style="font-size:14px;line-height:1.9;margin-top:4px;"><b style="color:#b9914f;">הערות:</b> ${esc(d.notes)}</div>` : '')
+          : ''}
 
         <div style="margin-top:26px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:12px;">
-          הופק עבור ${esc(DJ.name)} · נוצר בתאריך ${new Date().toLocaleDateString('he-IL')}
+          הופק עבור ${esc(DJ.name)} · ${new Date().toLocaleDateString('he-IL')}
         </div>
       </div>`;
-    }
-
-    // ---------- תזכורות יומן (Google Calendar + קובץ .ics) ----------
-    const EVENT_DURATION_HOURS = 5;      // משך משוער לאירוע (לקביעת שעת סיום ביומן)
-    const REMINDER_DAYS_BEFORE = 3;      // תזכורת מקדימה — כמה ימים לפני
-    const DEFAULT_START_HOUR = 19;       // שעת התחלה כברירת מחדל אם לא מולאה שעת קבלת פנים
-
-    const pad2 = (n) => String(n).padStart(2, '0');
-
-    // בניית מועד התחלת האירוע מתוך התאריך + שעת קבלת הפנים
-    function eventStartDate(d) {
-      if (!d.date) return null;
-      const [y, m, day] = d.date.split('-').map(Number);
-      let hh = DEFAULT_START_HOUR, mm = 0;
-      if (d.reception && /^\d{1,2}:\d{2}$/.test(d.reception)) {
-        [hh, mm] = d.reception.split(':').map(Number);
-      }
-      return new Date(y, m - 1, day, hh, mm, 0);
-    }
-    // פורמט מקומי לאירוע יומן: YYYYMMDDTHHMMSS (זמן "צף" — נשמר בשעון של היומן)
-    function fmtCalLocal(dt) {
-      return dt.getFullYear() + pad2(dt.getMonth() + 1) + pad2(dt.getDate()) +
-        'T' + pad2(dt.getHours()) + pad2(dt.getMinutes()) + '00';
-    }
-    function calTitle(d) {
-      return (`🎧 אירוע ${d.event_type || ''}` + (d.couple ? ' — ' + d.couple : '')).trim();
-    }
-    function calDetails(d) {
-      const lines = [];
-      if (d.couple) lines.push('לקוח: ' + d.couple);
-      if (d.reception) lines.push('קבלת פנים: ' + d.reception);
-      if (d.ceremony) lines.push('רגע מרכזי: ' + d.ceremony);
-      if (d.contact_phone) lines.push('איש קשר: ' + d.contact_phone);
-      if (d.nav_link) lines.push('ניווט: ' + d.nav_link);
-      return lines.join('\n');
-    }
-    function calLocation(d) {
-      return [d.venue, d.address].filter(Boolean).join(', ');
-    }
-
-    // קישור "הוספה ליומן" של Google — לחיצה אחת מוסיפה את האירוע ליומן של הדיג'יי.
-    // מקוצר בכוונה (כותרת + תאריך/שעה בלבד) כדי שלא יצא ארוך בהודעת הוואטסאפ —
-    // כל שאר הפרטים ממילא מופיעים בגוף ההודעה, ובקובץ ה-.ics יש את המידע המלא.
-    function googleCalUrl(d) {
-      const start = eventStartDate(d);
-      if (!start) return '';
-      const end = new Date(start.getTime() + EVENT_DURATION_HOURS * 3600 * 1000);
-      const params = new URLSearchParams({
-        action: 'TEMPLATE',
-        text: calTitle(d),
-        dates: fmtCalLocal(start) + '/' + fmtCalLocal(end),
-      });
-      return 'https://calendar.google.com/calendar/render?' + params.toString();
-    }
-
-    // קובץ .ics עם שתי תזכורות מובנות (3 ימים לפני + 09:00 בבוקר יום האירוע)
-    function buildIcs(d) {
-      const start = eventStartDate(d);
-      if (!start) return '';
-      const end = new Date(start.getTime() + EVENT_DURATION_HOURS * 3600 * 1000);
-      const morning = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 9, 0, 0);
-      // תזכורת הבוקר כהיסט יחסי לפני ההתחלה (תקני לכל יומן, ללא תלות באזור זמן)
-      const morningMin = Math.round((start - morning) / 60000);
-      const morningTrigger = morningMin > 0 ? `-PT${morningMin}M` : 'PT0M';
-      const ce = (s) => (s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
-      const title = calTitle(d);
-      const lines = [
-        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Yedidya Yona DJ//Event Reminder//HE',
-        'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
-        'BEGIN:VEVENT',
-        'UID:dj-' + start.getTime() + '@yedidya-yona',
-        'DTSTAMP:' + fmtCalLocal(new Date()),
-        'DTSTART:' + fmtCalLocal(start),
-        'DTEND:' + fmtCalLocal(end),
-        'SUMMARY:' + ce(title),
-        'DESCRIPTION:' + ce(calDetails(d)),
-        'LOCATION:' + ce(calLocation(d)),
-        'BEGIN:VALARM', 'ACTION:DISPLAY',
-        'DESCRIPTION:' + ce(`בעוד ${REMINDER_DAYS_BEFORE} ימים — ${title}`),
-        `TRIGGER:-P${REMINDER_DAYS_BEFORE}D`, 'END:VALARM',
-        'BEGIN:VALARM', 'ACTION:DISPLAY',
-        'DESCRIPTION:' + ce('היום האירוע! — ' + title),
-        'TRIGGER:' + morningTrigger, 'END:VALARM',
-        'END:VEVENT', 'END:VCALENDAR',
-      ];
-      return lines.join('\r\n');
-    }
-
-    function downloadIcs() {
-      const d = currentData || collectData();
-      const ics = buildIcs(d);
-      if (!ics) { alert('צריך למלא לפחות תאריך אירוע כדי ליצור תזכורת ביומן.'); return; }
-      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const safeName = (d.couple || 'אירוע').replace(/[\\/:*?"<>|]/g, '').slice(0, 40);
-      a.href = url;
-      a.download = `תזכורת-אירוע-${safeName}.ics`;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     // ---------- שמירת טיוטה ----------
@@ -844,7 +578,6 @@
       if (!d) return;
       TEXT_FIELDS.forEach(n => { if (form[n] && typeof d[n] === 'string') form[n].value = d[n]; });
       CHIP_GROUPS.forEach(g => (d[g] || []).forEach(v => setChecked(g, v)));
-      toggleOther('reception_vibe'); toggleOther('dancefloor_styles');
       updateEventType();
     }
     function saveDraft() {
@@ -860,25 +593,67 @@
       applyDraftObject(d);
     }
 
-    // ---------- בר התקדמות ----------
-    function updateProgress() {
-      const f = form;
-      const m = [
-        () => f.event_type.value, () => f.couple.value.trim(), () => f.date.value,
-        () => f.reception.value, () => f.ceremony.value, () => f.venue.value.trim(),
-        () => f.contact_phone.value.trim(),
-        () => URL_FIELDS.some(n => f[n].value.trim()),
-        () => getChecked('reception_vibe').length || getChecked('dancefloor_styles').length,
-        () => f.must_play.value.trim() || f.do_not_play.value.trim() || f.notes.value.trim(),
-      ];
-      const pct = Math.round(m.filter(fn => fn()).length / m.length * 100);
-      document.getElementById('progressBar').style.width = pct + '%';
+    // ---------- ניווט בין שלבים ----------
+    const TOTAL_STEPS = 4;
+    let currentStep = 1;
+    const sections = [...document.querySelectorAll('section[data-step]')];
+    const dots = [...document.querySelectorAll('[data-dot]')];
+    const backBtn = document.getElementById('backBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showStep(n) {
+      currentStep = n;
+      sections.forEach(s => s.classList.toggle('hidden', +s.dataset.step !== n));
+      dots.forEach((dot, i) => {
+        const step = i + 1;
+        dot.classList.toggle('active', step === n);
+        dot.classList.toggle('done', step < n);
+      });
+      backBtn.classList.toggle('hidden', n === 1);
+      nextBtn.classList.toggle('hidden', n === TOTAL_STEPS);
+      submitBtn.classList.toggle('hidden', n !== TOTAL_STEPS);
+      document.getElementById('progressBar').style.width = (n / TOTAL_STEPS * 100) + '%';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    function flashError(el) {
+      el.style.borderColor = '#e74c3c';
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.focus({ preventScroll: true });
+      setTimeout(() => { el.style.borderColor = ''; }, 2500);
+    }
+
+    const STEP_REQUIRED = {
+      1: ['event_type', 'couple', 'date', 'start_time'],
+      2: ['venue', 'contact_phone'],
+      3: [],
+      4: [],
+    };
+
+    function validateStep(n) {
+      for (const name of STEP_REQUIRED[n]) {
+        if (!form[name].value.trim()) { flashError(form[name]); return false; }
+      }
+      if (n === 3 && getChecked('music_style').length === 0) {
+        document.getElementById('styleErr').classList.remove('hidden');
+        document.getElementById('music_style').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+      }
+      return true;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (!validateStep(currentStep)) return;
+      if (currentStep < TOTAL_STEPS) showStep(currentStep + 1);
+    });
+    backBtn.addEventListener('click', () => {
+      if (currentStep > 1) showStep(currentStep - 1);
+    });
 
     // ---------- שינוי בטופס ----------
     let saveTimer = null;
     function onFormChange() {
-      updateProgress();
       clearTimeout(saveTimer);
       saveTimer = setTimeout(saveDraft, 300);
     }
@@ -902,7 +677,7 @@
       try {
         await html2pdf().set({
           margin: [16, 0, 16, 0],
-          filename: `דף-אירוע-${safeName}.pdf`,
+          filename: `סיכום-אירוע-${safeName}.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
           jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
@@ -917,19 +692,11 @@
       }
     }
     document.getElementById('pdfBtn').addEventListener('click', downloadPdf);
-    document.getElementById('calBtn').addEventListener('click', downloadIcs);
 
-    // ---------- ולידציה ----------
-    function flashError(el) {
-      el.style.borderColor = '#e74c3c';
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.focus({ preventScroll: true });
-      setTimeout(() => { el.style.borderColor = ''; }, 2500);
-    }
-    function validate() {
-      const required = ['event_type', 'couple', 'date', 'venue', 'reception', 'ceremony', 'contact_phone'];
-      for (const n of required) {
-        if (!form[n].value.trim()) { flashError(form[n]); return false; }
+    // ---------- שליחה ----------
+    function validateAll() {
+      for (let n = 1; n <= TOTAL_STEPS; n++) {
+        if (!validateStep(n)) { showStep(n); return false; }
       }
       if (!form.confirm.checked) {
         document.getElementById('confirmErr').classList.remove('hidden');
@@ -939,14 +706,12 @@
       return true;
     }
 
-    // ---------- שליחה ----------
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (!validate()) return;
+      if (!validateAll()) return;
       const data = collectData();
       currentData = data;
-      document.getElementById('whatsappBtn').href = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(waMessage(data))}`;
-      document.getElementById('pdfNote').classList.toggle('hidden', !needsPdf);
+      document.getElementById('whatsappBtn').href = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(buildWhatsappText(data))}`;
       document.getElementById('formView').classList.add('hidden');
       document.getElementById('successView').classList.remove('hidden');
       window.scrollTo(0, 0);
@@ -967,22 +732,11 @@
       setTimeout(() => confetti({ particleCount: 50, angle: 120, spread: 60, origin: { x: 1 }, colors }), 350);
     }
 
-    // ---------- כניסה מדורגת ----------
-    (function reveal() {
-      const sections = document.querySelectorAll('#eventForm section');
-      if (!('IntersectionObserver' in window)) return;
-      sections.forEach((s, i) => { s.classList.add('reveal'); s.style.transitionDelay = (i * 50) + 'ms'; });
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-      }, { threshold: 0.06 });
-      sections.forEach(s => io.observe(s));
-    })();
-
     // ---------- אתחול ----------
     (function init() {
       form.date.min = new Date().toISOString().split('T')[0];
       restoreDraft();
-      updateProgress();
+      showStep(1);
     })();
   </script>
 </body>
