@@ -164,7 +164,11 @@
             <input type="time" name="start_time" required class="field w-full rounded-xl px-4 py-3 text-gray-100" />
           </div>
 
-          <div class="sm:col-span-2">
+          <div>
+            <label class="block text-sm text-gray-300 mb-1.5">שעת סיום משוערת <span class="text-gray-500">(רשות)</span></label>
+            <input type="time" name="end_time" class="field w-full rounded-xl px-4 py-3 text-gray-100" />
+          </div>
+          <div>
             <label class="block text-sm text-gray-300 mb-1.5">כמות אורחים משוערת <span class="text-gray-500">(רשות)</span></label>
             <input type="number" name="guests" min="1" inputmode="numeric" placeholder="לדוגמה: 250"
               class="field w-full rounded-xl px-4 py-3 text-gray-100" />
@@ -352,13 +356,18 @@
       לחצו כאן כדי לפתוח וואטסאפ לידידיה ולשלוח את סיכום האירוע
     </a>
 
-    <p class="text-xs text-goldsoft mt-4">📎 רוצים שלידידיה יקבל הכל מסודר? הורידו את ה-PDF וצרפו אותו להודעת הוואטסאפ.</p>
+    <p class="text-xs text-goldsoft mt-4">📎 לא ניתן לצרף PDF אוטומטית לוואטסאפ — אפשר להוריד את ה-PDF למטה ולצרף אותו ידנית בהודעה.</p>
 
     <div class="mt-6 flex flex-col items-center gap-3">
       <button id="pdfBtn" type="button"
         class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
         ⬇️ הורדת סיכום האירוע (PDF)
       </button>
+      <a id="calBtn" href="#" target="_blank" rel="noopener"
+        class="text-goldsoft text-sm border border-line rounded-xl px-5 py-2.5 hover:border-gold hover:bg-panel transition">
+        📅 הוסף את האירוע ליומן גוגל
+      </a>
+      <p class="text-[11px] text-gray-500 -mt-1">הקישור ליומן מיועד לידידיה — הוא נכלל גם בהודעת הוואטסאפ וב-PDF.</p>
       <button id="newFormBtn" type="button" class="text-gray-500 text-sm hover:text-gray-300 transition">↻ מילוי טופס חדש</button>
     </div>
   </section>
@@ -435,7 +444,7 @@
     }
 
     // ---------- איסוף נתונים ----------
-    const TEXT_FIELDS = ['event_type', 'couple', 'date', 'start_time', 'guests',
+    const TEXT_FIELDS = ['event_type', 'couple', 'date', 'start_time', 'end_time', 'guests',
       'venue', 'contact_phone', 'address', 'nav_link', 'contact2',
       'dj_freedom', 'song_chupah', 'song_glass', 'song_slow',
       'song_entrance', 'song_main', 'song_family',
@@ -450,46 +459,90 @@
       return d;
     }
 
-    // ---------- הודעת וואטסאפ (קצרה ומסודרת) ----------
+    // ---------- קישור מוכן ליומן גוגל (ללא API / ללא התחברות) ----------
+    const EVENT_DURATION_HOURS = 5;            // ברירת מחדל למשך אירוע אם אין שעת סיום
+    const pad2 = (n) => String(n).padStart(2, '0');
+
+    function eventStartDate(d) {
+      if (!d.date || !/^\d{1,2}:\d{2}$/.test(d.start_time || '')) return null;
+      const [y, m, day] = d.date.split('-').map(Number);
+      const [hh, mm] = d.start_time.split(':').map(Number);
+      if ([y, m, day, hh, mm].some(isNaN)) return null;
+      return new Date(y, m - 1, day, hh, mm, 0);
+    }
+    function eventEndDate(d, start) {
+      if (/^\d{1,2}:\d{2}$/.test(d.end_time || '')) {
+        const [eh, em] = d.end_time.split(':').map(Number);
+        let end = new Date(start.getFullYear(), start.getMonth(), start.getDate(), eh, em, 0);
+        if (end <= start) end = new Date(end.getTime() + 24 * 3600 * 1000); // חצה חצות
+        return end;
+      }
+      return new Date(start.getTime() + EVENT_DURATION_HOURS * 3600 * 1000);
+    }
+    // פורמט זמן "צף" (מקומי, ללא אזור זמן) — נשמר בשעון של מי שמוסיף את האירוע
+    function fmtCalLocal(dt) {
+      return dt.getFullYear() + pad2(dt.getMonth() + 1) + pad2(dt.getDate()) +
+        'T' + pad2(dt.getHours()) + pad2(dt.getMinutes()) + '00';
+    }
+    function calTitle(d) {
+      return `אירוע DJ - ${d.event_type || 'אירוע'}${d.couple ? ' - ' + d.couple : ''}`;
+    }
+    function calLocation(d) {
+      return [d.venue, d.address].filter(Boolean).join(', ');
+    }
+    function calDescription(d) {
+      const join = a => (a && a.length) ? a.join(', ') : '';
+      const lines = [];
+      if (d.couple) lines.push('שם הלקוח: ' + d.couple);
+      if (d.contact_phone) lines.push('טלפון: ' + d.contact_phone);
+      if (d.event_type) lines.push('סוג אירוע: ' + d.event_type);
+      if (d.guests) lines.push('כמות אורחים: ' + d.guests);
+      if (d.music_style && d.music_style.length) lines.push('סגנון מוזיקלי: ' + join(d.music_style));
+      if (d.dj_freedom) lines.push("חופש לדיג'יי: " + d.dj_freedom);
+      if (d.must_play) lines.push('שירי חובה: ' + d.must_play);
+      if (d.do_not_play) lines.push('שירים אסורים: ' + d.do_not_play);
+      if (d.tech_notes) lines.push('דגשים טכניים: ' + d.tech_notes);
+      if (d.notes) lines.push('הערות מיוחדות: ' + d.notes);
+      return lines.join('\n');
+    }
+    // יוצר קישור מוכן שפותח אצל ידידיה אירוע חדש ביומן גוגל בלחיצה אחת.
+    // short=true ⇐ גרסה מקוצרת (כותרת + תאריך/שעה + מיקום בלבד, בלי התיאור הארוך),
+    // לשימוש כטקסט גלוי בהודעת הוואטסאפ כדי שהקישור יישאר קצר ככל האפשר.
+    function googleCalUrl(d, short) {
+      const start = eventStartDate(d);
+      if (!start) return '';
+      const end = eventEndDate(d, start);
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: calTitle(d),
+        dates: fmtCalLocal(start) + '/' + fmtCalLocal(end),
+      });
+      const loc = calLocation(d);
+      if (loc) params.set('location', loc);
+      if (!short) params.set('details', calDescription(d));
+      return 'https://calendar.google.com/calendar/render?' + params.toString();
+    }
+
+    // ---------- הודעת וואטסאפ (קצרה ונקייה) ----------
     function buildWhatsappText(d) {
-      const wedding = WEDDING_TYPES.includes(d.event_type);
-      const mitzvah = MITZVAH_TYPES.includes(d.event_type);
       const join = a => a.length ? a.join(', ') : '';
-      const L = (label, val) => val ? `${label}: ${val}` : null;
+      const line = (emoji, val) => val ? `${emoji} ${val}` : null;
 
       const p = [
         'היי ידידיה, מילאנו את טופס האירוע 🎧',
-        'מצורף סיכום מסודר עם כל הפרטים החשובים:',
+        'מצורף סיכום מסודר עם כל הפרטים החשובים.',
         '',
-        L('🎉 סוג אירוע', d.event_type),
-        L('👤 לקוח', d.couple),
-        L('📅 תאריך', fmtDate(d.date)),
-        L('🕐 שעת התחלה', d.start_time),
-        L('📍 מקום', d.venue),
-        L('🗺️ כתובת', d.address),
-        L('🧭 ניווט', d.nav_link),
-        L('👥 אורחים', d.guests),
-        L('📞 טלפון', d.contact_phone),
-        L('🎵 סגנון מוזיקלי', join(d.music_style)),
-        L("🎚️ חופש לדיג'יי", d.dj_freedom),
+        line('🎉', `${d.event_type || 'אירוע'}${d.couple ? ' — ' + d.couple : ''}`),
+        line('📅', `${fmtDate(d.date)}${d.start_time ? ' · ' + d.start_time : ''}`),
+        line('📍', d.venue),
+        line('📞', d.contact_phone),
+        line('🎵', join(d.music_style)),
       ];
 
-      const songs = [];
-      if (wedding) {
-        if (d.song_chupah) songs.push('חופה: ' + d.song_chupah);
-        if (d.song_glass) songs.push('שבירת כוס: ' + d.song_glass);
-        if (d.song_slow) songs.push('סלואו: ' + d.song_slow);
-      } else if (mitzvah) {
-        if (d.song_entrance) songs.push('כניסה: ' + d.song_entrance);
-        if (d.song_main) songs.push('מרכזי: ' + d.song_main);
-        if (d.song_family) songs.push('משפחה: ' + d.song_family);
-      }
-      if (songs.length) { p.push('', '🎼 שירי מפתח:'); songs.forEach(s => p.push('• ' + s)); }
+      const gcal = googleCalUrl(d, true); // גרסה מקוצרת לקישור הגלוי בהודעה
+      if (gcal) p.push('', '📅 הוסף את האירוע ליומן גוגל:', gcal);
 
-      if (d.must_play) p.push('', '✅ חייבים לנגן:', d.must_play);
-      if (d.do_not_play) p.push('', '⛔ אסור לנגן:', d.do_not_play);
-      if (d.tech_notes) p.push('', '🔌 דגשים טכניים: ' + d.tech_notes);
-      if (d.notes) p.push('', '📝 הערות: ' + d.notes);
+      p.push('', '📎 את הסיכום המלא (PDF) אפשר לצרף כאן להודעה.');
 
       return p.filter(x => x !== null && x !== undefined).join('\n').replace(/\n{3,}/g, '\n\n').trim();
     }
@@ -498,6 +551,7 @@
     function buildPdfHtml(d) {
       const wedding = WEDDING_TYPES.includes(d.event_type);
       const mitzvah = MITZVAH_TYPES.includes(d.event_type);
+      const gcal = googleCalUrl(d);
       const join = a => a.length ? a.join(' · ') : '';
       const TD = 'style="page-break-inside:avoid;"';
       const row = (label, val) => (!val) ? '' :
@@ -556,10 +610,15 @@
         ${H('⛔ שירים אסורים')}
         ${block(d.do_not_play)}
 
-        ${(d.tech_notes || d.notes) ? H('הערות ודגשים חשובים') +
+        ${(d.tech_notes || d.notes) ? H('דגשים טכניים והערות מיוחדות') +
           (d.tech_notes ? `<div style="font-size:14px;line-height:1.9;"><b style="color:#b9914f;">דגשים טכניים:</b> ${esc(d.tech_notes)}</div>` : '') +
           (d.notes ? `<div style="font-size:14px;line-height:1.9;margin-top:4px;"><b style="color:#b9914f;">הערות:</b> ${esc(d.notes)}</div>` : '')
           : ''}
+
+        ${gcal ? `<div style="margin-top:24px;text-align:center;page-break-inside:avoid;">
+          <a href="${esc(gcal)}" style="display:inline-block;background:#d4af6a;color:#0b0b12;font-weight:800;text-decoration:none;padding:11px 22px;border-radius:8px;font-size:15px;">📅 הוסף את האירוע ליומן גוגל</a>
+          <div style="font-size:11px;color:#999;margin-top:6px;">(לחיצה על הקישור פותחת את האירוע ביומן גוגל של ידידיה)</div>
+        </div>` : ''}
 
         <div style="margin-top:26px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:12px;">
           הופק עבור ${esc(DJ.name)} · ${new Date().toLocaleDateString('he-IL')}
@@ -712,6 +771,10 @@
       const data = collectData();
       currentData = data;
       document.getElementById('whatsappBtn').href = `https://wa.me/${DJ.phone}?text=${encodeURIComponent(buildWhatsappText(data))}`;
+      const gcal = googleCalUrl(data);
+      const calBtn = document.getElementById('calBtn');
+      if (gcal) { calBtn.href = gcal; calBtn.classList.remove('hidden'); }
+      else { calBtn.classList.add('hidden'); }
       document.getElementById('formView').classList.add('hidden');
       document.getElementById('successView').classList.remove('hidden');
       window.scrollTo(0, 0);
